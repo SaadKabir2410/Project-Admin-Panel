@@ -1,0 +1,44 @@
+import { useState } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import Navbar from "./component/layout/Navbar";
+import Sidebar from "./component/layout/Sidebar";
+import LoginPage from "./pages/Auth/Login";
+import Dashboard from "./pages/Dashboard";
+import ProtectedRoute from "./component/auth/ProtectedRoute";
+
+function Layout({ collapsed, setCollapsed }) {
+  return (
+    <div className="flex h-screen w-screen dark:bg-slate-950 bg-slate-50 text-slate-900 dark:text-white transition-colors duration-300">
+      <Sidebar collapsed={collapsed} />
+      <div className="flex flex-col flex-1 h-screen overflow-hidden">
+        <Navbar Collapsed={collapsed} setCollapsed={setCollapsed} />
+        <main className="flex-1 overflow-auto p-6 bg-slate-50 dark:bg-[#020617] transition-colors duration-300">
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </main>
+      </div>
+    </div>
+  );
+}
+
+export default function App() {
+  const [collapsed, setCollapsed] = useState(false);
+
+  return (
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route
+        path="/*"
+        element={
+          <ProtectedRoute>
+            <Layout collapsed={collapsed} setCollapsed={setCollapsed}>
+              <Dashboard />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
+  );
+}
