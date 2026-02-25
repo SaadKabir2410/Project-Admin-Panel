@@ -5,7 +5,8 @@
 import axios from 'axios';
 
 // 1. Set up your API configuration
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://your-backend-api.com/api';
+const API_BASE_URL = (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE_URL) ||
+    'https://sureze.ddns.net:3333/api/app';
 
 const api = axios.create({
     baseURL: API_BASE_URL,
@@ -21,48 +22,41 @@ const api = axios.create({
 const DB = {
     // ── Tickets ──────────────────────────────────────────────────────────────
     tickets: {
-        getAll: (params) => api.get('/tickets', { params }).then(r => r.data),
+        getAll: (params) => {
+            const { page = 1, perPage = 10, search, sortKey, sortDir } = params;
+            const apiParams = {
+                SkipCount: (page - 1) * perPage,
+                skipCount: (page - 1) * perPage, // Send both cases for compatibility
+                MaxResultCount: perPage,
+                maxResultCount: perPage,
+                Filter: search || undefined,
+                Sorting: sortKey ? `${sortKey} ${sortDir}` : undefined
+            };
+            return api.get('/tickets', { params: apiParams }).then(r => r.data);
+        },
         getById: (id) => api.get(`/tickets/${id}`).then(r => r.data),
         create: (data) => api.post('/tickets', data).then(r => r.data),
         update: (id, data) => api.put(`/tickets/${id}`, data).then(r => r.data),
         delete: (id) => api.delete(`/tickets/${id}`).then(r => r.data),
         getStats: () => api.get('/tickets/stats').then(r => r.data),
-        async getAll(params = {}) {
-            const response = await api.get('/tickets', { params });
-            return response.data;
-        },
-
-        async getById(id) {
-            const response = await api.get(`/tickets/${id}`);
-            return response.data;
-        },
-
-        async create(payload) {
-            const response = await api.post('/tickets', payload);
-            return response.data;
-        },
-
-        async update(id, payload) {
-            const response = await api.put(`/tickets/${id}`, payload);
-            return response.data;
-        },
-
-        async delete(id) {
-            const response = await api.delete(`/tickets/${id}`);
-            return response.data; // Usually returns true or { success: true }
-        },
-
-        async getStats() {
-            const response = await api.get('/tickets/stats');
-            return response.data;
-        },
     },
     sites: {
-        getAll: (params) => api.get('/sites', { params }).then(r => r.data),
-        getById: (id) => api.get(`/sites/${id}`).then(r => r.data),
-        create: (data) => api.post('/sites', data).then(r => r.data),
-        update: (id, data) => api.put(`/sites/${id}`, data).then(r => r.data),
-        delete: (id) => api.delete(`/sites/${id}`).then(r => r.data),
+        getAll: (params) => {
+            const { page = 1, perPage = 10, search, sortKey, sortDir } = params;
+            const apiParams = {
+                SkipCount: (page - 1) * perPage,
+                skipCount: (page - 1) * perPage, // Send both cases for compatibility
+                MaxResultCount: perPage,
+                maxResultCount: perPage,
+                Filter: search || undefined,
+                Sorting: sortKey ? `${sortKey} ${sortDir}` : undefined
+            };
+            return api.get('/site/paged-list', { params: apiParams }).then(r => r.data);
+        },
+        getById: (id) => api.get(`/site/${id}/by-id`).then(r => r.data),
+        create: (data) => api.post('/site', data).then(r => r.data),
+        update: (id, data) => api.put(`/site/${id}`, data).then(r => r.data),
+        delete: (id) => api.delete(`/site/${id}`).then(r => r.data),
     }
 };
 

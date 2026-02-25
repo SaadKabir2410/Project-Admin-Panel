@@ -1,164 +1,252 @@
-import { useState, useEffect } from 'react'
-import { X, Loader2, Save, AlertCircle, Building2, MapPin, Hash } from 'lucide-react'
-import { STATUSES } from '../../data/DB'
-
-function Field({ label, error, children }) {
-    return (
-        <div className="space-y-1.5">
-            <label className="text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">{label}</label>
-            {children}
-            {error && (
-                <p className="text-xs text-red-500 flex items-center gap-1 mt-1">
-                    <AlertCircle size={10} /> {error}
-                </p>
-            )}
-        </div>
-    )
-}
-
-const inputClass = "w-full text-sm px-4 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-[#242938] text-slate-700 dark:text-slate-200 placeholder-slate-400 outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 transition-all shadow-sm"
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Dialog, IconButton, Autocomplete, TextField } from '@mui/material';
+import { X, Loader2, Check } from 'lucide-react';
 
 const EMPTY = {
-    siteName: '',
-    siteOcn: '',
-    location: '',
+    name: '',
+    oCN: '',
+    countryId: '',
+    address: '',
     status: 'Active',
-}
+};
 
 export default function SiteModal({ open, onClose, onSubmit, site = null, loading = false }) {
-    const isEdit = !!site
-    const [form, setForm] = useState(EMPTY)
-    const [errors, setErrors] = useState({})
+    const isEdit = !!site;
+    const [form, setForm] = useState(EMPTY);
+    const [errors, setErrors] = useState({});
+
+    const [countries, setCountries] = useState([]);
+    const [loadingCountries, setLoadingCountries] = useState(false);
 
     useEffect(() => {
         if (open) {
-            setErrors({})
+            setErrors({});
             if (site) {
                 setForm({
-                    siteName: site.siteName || '',
-                    siteOcn: site.siteOcn || '',
-                    location: site.location || '',
+                    name: site.name || '',
+                    oCN: site.ocn || site.oCN || '',
+                    countryId: site.countryId || site.country?.id || '',
+                    address: site.address || '',
                     status: site.status || 'Active',
-                })
+                });
             } else {
-                setForm(EMPTY)
+                setForm(EMPTY);
             }
         }
-    }, [open, site])
+    }, [open, site]);
 
-    const set = (key) => (e) => {
-        setForm(f => ({ ...f, [key]: e.target.value }))
-        if (errors[key]) setErrors(e => ({ ...e, [key]: '' }))
-    }
+    useEffect(() => {
+        if (!open || countries.length > 0) return;
+
+        const fetchCountries = async () => {
+            setLoadingCountries(true);
+            try {
+                // Keep the actual country objects so we can grab the ID
+                const response = await axios.get('/api/app/country');
+                const countryList = response.data.sort((a, b) => a.name.localeCompare(b.name));
+                setCountries(countryList);
+            } catch (error) {
+                console.error("Failed to load countries", error);
+            } finally {
+                setLoadingCountries(false);
+            }
+        };
+
+        fetchCountries();
+    }, [open, countries.length]);
+
+    const handleChange = (field) => (e) => {
+        setForm(f => ({ ...f, [field]: e.target.value }));
+        if (errors[field]) {
+            setErrors(errs => ({ ...errs, [field]: '' }));
+        }
+    };
 
     const validate = () => {
-        const errs = {}
-        if (!form.siteName) errs.siteName = 'Organization name is required'
-        if (!form.siteOcn) errs.siteOcn = 'OCN number is required'
-        if (!form.location) errs.location = 'Location is required'
-        return errs
-    }
+        const errs = {};
+        if (!form.name) errs.name = "Name is required";
+        else if (form.name.length > 200) errs.name = "Name cannot exceed 200";
+
+        if (!form.oCN) errs.oCN = "OCN is required";
+        else if (form.oCN.length > 50) errs.oCN = "OCN cannot exceed 50";
+
+        if (!form.countryId) errs.countryId = "Country is required";
+
+        if (form.address && form.address.length > 500) errs.address = "Address cannot exceed 500";
+
+        return errs;
+    };
 
     const handleSubmit = (e) => {
-        e.preventDefault()
-        const errs = validate()
-        if (Object.keys(errs).length) { setErrors(errs); return }
-        onSubmit(form)
-    }
+        if (e && e.preventDefault) e.preventDefault();
+        const errs = validate();
+        if (Object.keys(errs).length) {
+            setErrors(errs);
+            return;
+        }
 
-    if (!open) return null
+        const payload = { ...form };
+        payload.ocn = payload.oCN;
+        delete payload.oCN;
+
+        if (isEdit) {
+            payload.id = site.id;
+            payload.concurrencyStamp = site.concurrencyStamp;
+        }
+
+        onSubmit(payload);
+    };
+
+    const InputLabel = ({ label, required }) => (
+        <label className="block text-sm font-semibold text-slate-600 dark:text-slate-300 mb-1.5">
+            {label} {required && <span className="text-red-500">*</span>}
+        </label>
+    );
+
+    const inputClasses = (error, isValid) =>
+        `w-full px-4 py-2.5 rounded-xl border outline-none transition-all text-sm ` +
+        (error
+            ? `bg-red-50/50 border-red-400 text-red-900 placeholder:text-red-300 dark:bg-red-500/10 dark:border-red-500/50 dark:text-red-200`
+            : isValid
+                ? `bg-green-50/50 border-green-500 focus:border-green-600 text-green-900 dark:bg-green-500/10 dark:border-green-500/50 dark:text-green-200`
+                : `bg-slate-50 border-slate-200 hover:border-slate-300 focus:bg-white focus:border-blue-500 text-slate-700 placeholder:text-slate-400 dark:bg-[#242938] dark:border-white/10 dark:text-slate-200 dark:focus:border-blue-500`);
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm animate-fade-in" onClick={onClose} />
-            <div className="relative w-full max-w-lg bg-white dark:bg-[#1e2436] rounded-2xl border border-slate-200 dark:border-white/10 shadow-2xl animate-slide-up overflow-hidden">
+        <Dialog
+            open={open}
+            onClose={onClose}
+            maxWidth="sm"
+            fullWidth
+            PaperProps={{
+                sx: { borderRadius: '16px', bgcolor: 'background.paper', p: 1 },
+                className: "bg-white dark:bg-[#1e2436] dark:text-white"
+            }}
+        >
+            <div className="flex items-center justify-between px-6 pt-5 pb-3">
+                <h2 className="text-lg font-bold text-slate-800 dark:text-white">
+                    {isEdit ? 'Edit Site' : 'New Site'}
+                </h2>
+                <IconButton onClick={onClose} size="small" className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300">
+                    <X size={20} />
+                </IconButton>
+            </div>
 
-                {/* Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-white/10 bg-slate-50/50 dark:bg-white/2">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center text-blue-500">
-                            <Building2 size={20} />
-                        </div>
-                        <div>
-                            <h2 className="text-lg font-bold text-slate-800 dark:text-white">
-                                {isEdit ? 'Edit Site' : 'Add New Site'}
-                            </h2>
-                            <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-widest mt-0.5">Organization Details</p>
-                        </div>
+            <div className="px-6 py-2 space-y-5">
+                <div>
+                    <InputLabel label="Name" required />
+                    <div className="relative">
+                        <input
+                            type="text"
+                            maxLength={200}
+                            value={form.name}
+                            onChange={handleChange('name')}
+                            className={inputClasses(errors.name, form.name.length > 0 && !errors.name)}
+                        />
+                        {form.name.length > 0 && !errors.name && (
+                            <Check size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-green-500" />
+                        )}
                     </div>
-                    <button onClick={onClose} className="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-white/5 transition-all">
-                        <X size={18} />
-                    </button>
+                    {typeof errors.name === 'string' && <p className="text-red-500 text-xs font-semibold mt-1.5">{errors.name}</p>}
                 </div>
 
-                {/* Form Body */}
-                <form onSubmit={handleSubmit}>
-                    <div className="px-6 py-6 space-y-5">
-                        <Field label="Organization Name" error={errors.siteName}>
-                            <div className="relative">
-                                <Building2 size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                                <input
-                                    type="text"
-                                    value={form.siteName}
-                                    onChange={set('siteName')}
-                                    placeholder="e.g. NHSBT FILTON (MSC)"
-                                    className={`${inputClass} pl-11`}
-                                />
-                            </div>
-                        </Field>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                            <Field label="OCN Number" error={errors.siteOcn}>
-                                <div className="relative">
-                                    <Hash size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                                    <input
-                                        type="text"
-                                        value={form.siteOcn}
-                                        onChange={set('siteOcn')}
-                                        placeholder="e.g. OCE00791"
-                                        className={`${inputClass} pl-11`}
-                                    />
-                                </div>
-                            </Field>
-                            <Field label="Status">
-                                <select value={form.status} onChange={set('status')} className={inputClass}>
-                                    <option value="Active">Active</option>
-                                    <option value="Inactive">Inactive</option>
-                                    <option value="Pending">Pending</option>
-                                </select>
-                            </Field>
-                        </div>
-
-                        <Field label="Location / City" error={errors.location}>
-                            <div className="relative">
-                                <MapPin size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                                <input
-                                    type="text"
-                                    value={form.location}
-                                    onChange={set('location')}
-                                    placeholder="e.g. Bristol, UK"
-                                    className={`${inputClass} pl-11`}
-                                />
-                            </div>
-                        </Field>
+                <div>
+                    <InputLabel label="OCN" required />
+                    <div className="relative">
+                        <input
+                            type="text"
+                            maxLength={50}
+                            value={form.oCN}
+                            onChange={handleChange('oCN')}
+                            className={inputClasses(errors.oCN, form.oCN.length > 0 && !errors.oCN)}
+                        />
+                        {form.oCN.length > 0 && !errors.oCN && (
+                            <Check size={16} className="absolute right-3 top-1/2 -translate-y-1/2 text-green-500" />
+                        )}
                     </div>
+                    {typeof errors.oCN === 'string' && <p className="text-red-500 text-xs font-semibold mt-1.5">{errors.oCN}</p>}
+                </div>
 
-                    {/* Footer */}
-                    <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-slate-100 dark:border-white/10 bg-slate-50/50 dark:bg-white/2">
-                        <button type="button" onClick={onClose} className="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-white/10 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 transition-all">
-                            Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-blue-500 hover:bg-blue-600 disabled:bg-blue-400 text-white text-sm font-bold transition-all shadow-lg shadow-blue-500/25 active:scale-95"
-                        >
-                            {loading ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
-                            {loading ? 'Saving...' : 'Save Site'}
-                        </button>
+                <div>
+                    <InputLabel label="Country" required />
+                    <Autocomplete
+                        options={countries}
+                        getOptionLabel={(option) => option.name || ''}
+                        isOptionEqualToValue={(option, value) => option.id === value.id}
+                        value={countries.find(c => c.id === form.countryId) || null}
+                        onChange={(e, newValue) => {
+                            setForm(f => ({ ...f, countryId: newValue ? newValue.id : '' }));
+                            if (errors.countryId) setErrors(errs => ({ ...errs, countryId: '' }));
+                        }}
+                        loading={loadingCountries}
+                        sx={{
+                            '& .MuiOutlinedInput-root': {
+                                borderRadius: '0.75rem',
+                                padding: '1.5px 12px',
+                                backgroundColor: 'transparent',
+                                '& fieldset': {
+                                    border: '1px solid',
+                                    borderColor: errors.countryId ? 'rgb(248 113 113)' : 'inherit',
+                                },
+                            },
+                        }}
+                        className={`w-full transition-all text-sm rounded-xl ${errors.countryId
+                            ? 'bg-red-50/50 text-red-900 placeholder:text-red-300 dark:bg-red-500/10 dark:text-red-200'
+                            : form.countryId
+                                ? 'bg-green-50/50 text-green-900 border-green-500 dark:bg-green-500/10 dark:text-green-200'
+                                : 'bg-slate-50 text-slate-700 dark:bg-[#242938] dark:text-slate-200'
+                            }`}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                placeholder={loadingCountries ? "Loading countries..." : "Select a country..."}
+                                variant="outlined"
+                                sx={{
+                                    '& .MuiInputBase-input': {
+                                        padding: '10px !important',
+                                    }
+                                }}
+                            />
+                        )}
+                    />
+                    {typeof errors.countryId === 'string' && <p className="text-red-500 text-xs font-semibold mt-1.5">{errors.countryId}</p>}
+                </div>
+
+                <div>
+                    <InputLabel label="Address" />
+                    <div className="relative">
+                        <textarea
+                            rows={3}
+                            maxLength={500}
+                            value={form.address}
+                            onChange={handleChange('address')}
+                            className={`${inputClasses(errors.address, form.address.length > 0 && !errors.address)} resize-y`}
+                        />
+                        {form.address.length > 0 && !errors.address && (
+                            <Check size={16} className="absolute right-3 top-3 text-green-500" />
+                        )}
                     </div>
-                </form>
+                    {typeof errors.address === 'string' && <p className="text-red-500 text-xs font-semibold mt-1.5">{errors.address}</p>}
+                </div>
+
             </div>
-        </div>
-    )
+
+            <div className="flex items-center justify-end gap-3 px-6 pt-6 pb-5">
+                <button
+                    type="button"
+                    onClick={onClose}
+                    className="px-5 py-2 rounded-xl border border-indigo-500 text-sm font-semibold text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors"
+                >
+                    Cancel
+                </button>
+                <button
+                    onClick={handleSubmit}
+                    disabled={loading}
+                    className="px-5 py-2 rounded-xl border border-indigo-500 text-sm font-semibold text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 transition-colors flex items-center justify-center min-w-[80px]"
+                >
+                    {loading ? <Loader2 size={16} className="animate-spin" /> : (isEdit ? 'Save' : 'Create')}
+                </button>
+            </div>
+        </Dialog>
+    );
 }

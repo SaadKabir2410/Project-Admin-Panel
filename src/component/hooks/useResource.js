@@ -11,11 +11,45 @@ export function useResource(apiObject, params) {
         setLoading(true);
         try {
             const res = await apiObject.getAll(params);
-            setData(res.data)
-            setTotal(res.total)
-            setTotalPages(res.totalPages)
+
+            let nextData = [];
+            let nextTotal = 0;
+            let nextTotalPages = 0;
+
+            // Normalize response (handle wrapping like { result: { items: [], totalCount: 0 } })
+            const responseData = res?.result || res;
+
+            if (Array.isArray(responseData)) {
+                nextData = responseData;
+                nextTotal = responseData.length;
+                nextTotalPages = 1;
+            } else if (responseData) {
+                nextData = responseData.data || responseData.items || [];
+                // More aggressive total count detection
+                nextTotal = responseData.totalCount ?? responseData.total ?? responseData.count ?? responseData.total_count ?? responseData.totalItems;
+
+                if (nextTotal === undefined) {
+                    // Fallback: If we got a full page of data, assume there might be a next page
+                    nextTotal = nextData.length === (params?.perPage || 10) ? (params?.page || 1) * (params?.perPage || 10) + 1 : nextData.length;
+                }
+
+                nextTotalPages = responseData.totalPages ?? Math.ceil(nextTotal / (params?.perPage || 10));
+            }
+
+            setData(nextData);
+            setTotal(nextTotal);
+            setTotalPages(nextTotalPages);
+            console.log('useResource fetch success:', {
+                dataLength: nextData.length,
+                total: nextTotal,
+                totalPages: nextTotalPages,
+                responseKeys: responseData ? Object.keys(responseData) : [],
+                params
+            });
         } catch (e) {
-            console.error(e);
+            console.error('useResource fetch error:', e);
+            setData([]);
+            setTotal(0);
         } finally {
             setLoading(false);
         }
