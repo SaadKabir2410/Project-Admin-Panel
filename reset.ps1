@@ -1,12 +1,27 @@
-# auto-push.ps1
-# Change directory to your project folder
-cd "G:\KABIR\React\Admin-Panel-Dashboard\Admin-Dashboard"
+# reset.ps1
+# This script automatically stages, commits, and pushes changes to the remote repository.
+
+# Set location to the directory where the script is located
+Set-Location $PSScriptRoot
+
+Write-Host "Starting auto-push process..." -ForegroundColor Cyan
 
 # Add all changes
 git add .
 
 # Commit changes with timestamp
-git commit -m "Auto-update $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')"
+$timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
+git commit -m "Auto-update $timestamp"
 
-# Push to main branch
-git push origin main
+# Get current branch name
+$branch = git branch --show-current
+if ([string]::IsNullOrEmpty($branch)) {
+    $branch = "main"
+}
+
+Write-Host "Pushing changes to branch: $branch" -ForegroundColor Yellow
+
+# Push to the current branch
+git push origin $branch
+
+Write-Host "Successfully pushed changes!" -ForegroundColor Green
