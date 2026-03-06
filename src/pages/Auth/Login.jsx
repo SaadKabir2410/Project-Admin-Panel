@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/Authcontext";
+import { useAuth as useOidc } from "react-oidc-context";
 import Logo from "../../assets/Sureze_Logo.png";
 import {
   Eye,
@@ -45,11 +46,10 @@ function InputField({
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className={`w-full pl-11 pr-11 py-3 bg-white dark:bg-slate-900 border ${
-            error
+          className={`w-full pl-11 pr-11 py-3 bg-white dark:bg-slate-900 border ${error
               ? "border-red-500 ring-2 ring-red-500/10"
               : "border-slate-200 dark:border-slate-800 group-focus-within:border-blue-500 group-focus-within:ring-4 group-focus-within:ring-blue-500/10"
-          } rounded-xl text-slate-700 dark:text-slate-200 placeholder:text-slate-400 outline-none transition-all`}
+            } rounded-xl text-slate-700 dark:text-slate-200 placeholder:text-slate-400 outline-none transition-all`}
         />
         {isPassword && (
           <button
@@ -74,6 +74,7 @@ function InputField({
 
 export default function LoginPage() {
   const { login, loading, error, clearError, user } = useAuth();
+  const oidc = useOidc();
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
@@ -352,6 +353,23 @@ export default function LoginPage() {
                   Sign In <ArrowRight size={16} />
                 </>
               )}
+            </button>
+
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-slate-200 dark:border-slate-800"></div>
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-slate-50 dark:bg-[#0f1117] px-2 text-slate-500">Or continue with</span>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => oidc.signinRedirect()}
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-semibold text-sm transition-all shadow-sm hover:shadow-md"
+            >
+              Sign in with SSO
             </button>
           </form>
         </div>

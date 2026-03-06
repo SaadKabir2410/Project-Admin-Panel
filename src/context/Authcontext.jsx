@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import { useAuth as useOidc } from "react-oidc-context";
 
 const AuthContext = createContext();
 
@@ -39,6 +40,7 @@ function saveUsers(users) {
 }
 
 export function AuthProvider({ children }) {
+  const oidc = useOidc();
   const [user, setUser] = useState(() => {
     try {
       const stored = localStorage.getItem(SESSION_KEY);
@@ -50,7 +52,24 @@ export function AuthProvider({ children }) {
       return null;
     }
   });
+
+  useEffect(() => {
+    if (oidc.isAuthenticated && oidc.user) {
+      const profile = oidc.user.profile;
+      const session = {
+        id: profile.sub,
+        name: profile.name || profile.preferred_username || profile.email,
+        email: profile.email,
+        role: profile.role || "admin",
+        avatar: (profile.name || profile.email || "U")[0].toUpperCase(),
+      };
+      localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+      setUser(session);
+    }
+  }, [oidc.isAuthenticated, oidc.user]);
+
   const [loading, setLoading] = useState(false);
+  const isAuthLoading = oidc.isLoading || loading;
   const [error, setError] = useState("");
   const clearError = () => setError("");
 
@@ -205,7 +224,7 @@ export function AuthProvider({ children }) {
     <AuthContext.Provider
       value={{
         user,
-        loading,
+        loading: isAuthLoading,
         error,
         clearError,
         register,

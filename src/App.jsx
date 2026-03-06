@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 import Navbar from "./component/layout/Navbar";
 import Sidebar from "./component/layout/Sidebar";
 import LoginPage from "./pages/Auth/Login";
+import AuthCallback from "./pages/AuthCallback";
 import Dashboard from "./pages/Dashboard";
 import ProtectedRoute from "./component/auth/ProtectedRoute";
 import AMSTicketsPage from "./pages/AMSTicketsPage";
@@ -57,6 +58,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/callback" element={<AuthCallback />} />
       <Route
         path="/*"
         element={
