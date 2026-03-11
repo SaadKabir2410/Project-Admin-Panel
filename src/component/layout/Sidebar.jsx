@@ -23,8 +23,7 @@ import {
 
 import clsx from "clsx";
 import { NAV_GROUPS } from "../../data/navData";
-import { useAuth } from "../../context/Authcontext";
-import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContextHook";
 
 const ICON_MAP = {
   LayoutDashboard,
@@ -54,16 +53,21 @@ function NavIcon({ name, size = 18 }) {
 
 export default function Sidebar({ collapsed }) {
   const { logout } = useAuth();
-  const navigate = useNavigate();
   const [showConfirmLogout, setShowConfirmLogout] = useState(false);
 
   const handleLogout = () => {
     setShowConfirmLogout(true);
   };
 
-  const confirmLogout = () => {
-    logout();
-    navigate("/login", { state: { loggedOut: true } });
+  const confirmLogout = async () => {
+    try {
+      await logout();
+      setShowConfirmLogout(false);
+    } catch (error) {
+      console.error("Logout failed:", error);
+      // Fallback redirect
+      window.location.href = "/login";
+    }
   };
 
   return (

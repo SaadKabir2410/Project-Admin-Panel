@@ -3,12 +3,11 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.jsx";
 import { ThemeProvider } from "./context/ThemeContext";
-import { AuthProvider as OidcProvider } from "react-oidc-context";
-import { AuthProvider } from "./context/Authcontext";
+import { AuthProvider as CustomAuthProvider } from "./context/Authcontext";
 import { BrowserRouter } from "react-router-dom";
 import { ToastProvider } from "./component/common/Toast";
-import { oidcConfig } from "./pages/Auth/authConfig.ts";
 import { Component } from "react";
+
 class ErrorBoundary extends Component {
   constructor(props) {
     super(props);
@@ -41,15 +40,13 @@ createRoot(document.getElementById("root")).render(
   <StrictMode>
     <ErrorBoundary>
       <BrowserRouter>
-        <OidcProvider {...oidcConfig}>
-          <AuthProvider>
-            <ThemeProvider>
-              <ToastProvider>
-                <App />
-              </ToastProvider>
-            </ThemeProvider>
-          </AuthProvider>
-        </OidcProvider>
+        <CustomAuthProvider>
+          <ThemeProvider>
+            <ToastProvider>
+              <App />
+            </ToastProvider>
+          </ThemeProvider>
+        </CustomAuthProvider>
       </BrowserRouter>
     </ErrorBoundary>
   </StrictMode>,

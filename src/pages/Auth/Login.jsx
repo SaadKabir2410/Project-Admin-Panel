@@ -1,14 +1,13 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
-import { useAuth } from "../../context/Authcontext";
-import { useAuth as useOidc } from "react-oidc-context";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../../context/AuthContextHook";
+
 import Logo from "../../assets/Sureze_Logo.png";
 import {
   Eye,
   EyeOff,
-  Mail,
+  User,
   Lock,
-  Layers,
   AlertCircle,
   ArrowRight,
   Loader2,
@@ -46,10 +45,12 @@ function InputField({
           value={value}
           onChange={onChange}
           placeholder={placeholder}
-          className={`w-full pl-11 pr-11 py-3 bg-white dark:bg-slate-900 border ${error
+          required
+          className={`w-full pl-11 pr-11 py-3 bg-white dark:bg-slate-900 border ${
+            error
               ? "border-red-500 ring-2 ring-red-500/10"
               : "border-slate-200 dark:border-slate-800 group-focus-within:border-blue-500 group-focus-within:ring-4 group-focus-within:ring-blue-500/10"
-            } rounded-xl text-slate-700 dark:text-slate-200 placeholder:text-slate-400 outline-none transition-all`}
+          } rounded-xl text-slate-700 dark:text-slate-200 placeholder:text-slate-400 outline-none transition-all`}
         />
         {isPassword && (
           <button
@@ -73,17 +74,18 @@ function InputField({
 }
 
 export default function LoginPage() {
-  const { login, loading, error, clearError, user } = useAuth();
-  const oidc = useOidc();
+  const { user, login, error: authContextError, clearError } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
-
-  const [form, setForm] = useState({ email: "", password: "" });
-  const [fieldErrors, setFieldErrors] = useState({});
-  const [remember, setRemember] = useState(false);
+  
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [localError, setLocalError] = useState("");
   const [showLoggedOutMessage, setShowLoggedOutMessage] = useState(false);
 
+  // If already authenticated, skip login page
   useEffect(() => {
     if (user) {
       navigate(from, { replace: true });
@@ -93,57 +95,33 @@ export default function LoginPage() {
   useEffect(() => {
     if (location.state?.loggedOut) {
       setShowLoggedOutMessage(true);
-
-      const timer = setTimeout(() => {
-        setShowLoggedOutMessage(false);
-      }, 3000);
+      const timer = setTimeout(() => setShowLoggedOutMessage(false), 3000);
       return () => clearTimeout(timer);
     }
   }, [location]);
 
-  useEffect(() => {
-    if (clearError) clearError();
-  }, [form]);
-
-  const validate = () => {
-    const errs = {};
-    if (!form.email) {
-      errs.email = "Email is Required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-      errs.email = "Email is Invalid";
-    }
-
-    if (!form.password) {
-      errs.password = "Password is Required";
-    } else if (form.password.length < 6) {
-      errs.password = "Password must be at least 6 characters long";
-    }
-    return errs;
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const errs = validate();
-    if (Object.keys(errs).length) {
-      setFieldErrors(errs);
-      return;
-    }
-    setFieldErrors({});
-    await login(form);
-  };
+    setLocalError("");
+    clearError();
+    setIsLoggingIn(true);
 
-  const set = (key) => (e) => setForm((f) => ({ ...f, [key]: e.target.value }));
+    const success = await login({ email: username, password });
+    if (success) {
+      navigate(from, { replace: true });
+    } else {
+      setIsLoggingIn(false);
+    }
+  };
 
   return (
     <div className="min-h-screen flex bg-slate-50 dark:bg-[#0f1117]">
       {/* ── Left Panel ── */}
-      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gradient-to-br from-[#1e3a5f] via-[#1a2d4e] to-[#0f1a2e] flex-col items-center justify-center p-12">
-        {/* Background decorations */}
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-linear-to-br from-[#1e3a5f] via-[#1a2d4e] to-[#0f1a2e] flex-col items-center justify-center p-12">
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-blue-600/10 blur-3xl" />
           <div className="absolute bottom-[-20%] right-[-10%] w-[400px] h-[400px] rounded-full bg-indigo-600/10 blur-3xl" />
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] rounded-full bg-blue-500/5 blur-2xl" />
-          {/* Grid pattern */}
           <div
             className="absolute inset-0 opacity-[0.03]"
             style={{
@@ -155,7 +133,6 @@ export default function LoginPage() {
         </div>
 
         <div className="relative z-10 text-center max-w-md">
-          {/* Premium Eye-Catchy Logo area */}
           <div className="flex flex-col items-center gap-10 mb-16 group relative">
             <style>
               {`
@@ -177,37 +154,24 @@ export default function LoginPage() {
             </style>
 
             <div className="relative logo-container">
-              {/* Rotating Light Rays */}
               <div className="ray absolute inset-0 -translate-x-1/2 -translate-y-1/2 left-1/2 top-1/2 w-[400px] h-[400px] bg-[conic-gradient(from_0deg,transparent,rgba(59,130,246,0.1),transparent_30%)] blur-3xl opacity-50" />
-
-              {/* High Highlight Glass Effect - Optimized to prevent bleed */}
               <div className="absolute inset-0 bg-blue-400/30 blur-[80px] rounded-full scale-[1.8] group-hover:bg-blue-400/40 transition-all duration-1000" />
-
-              {/* Premium Glass Container */}
               <div className="relative z-10 p-8 rounded-[40px] bg-white/5 border border-white/10 backdrop-blur-xl shadow-2xl overflow-hidden group-hover:border-blue-500/30 transition-colors duration-500">
-                {/* Reflection highlight */}
                 <div className="absolute top-0 left-0 w-full h-1/2 bg-gradient-to-b from-white/10 to-transparent skew-y-[-10deg] -translate-y-1/2" />
-
                 <img
                   src={Logo}
                   alt="Sureze Logo"
                   className="w-56 h-auto object-contain drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]"
                 />
               </div>
-
-              {/* Orbital particles */}
               <div className="absolute -top-4 -right-4 w-3 h-3 bg-blue-400 rounded-full blur-[2px] animate-pulse" />
               <div className="absolute -bottom-6 -left-6 w-2 h-2 bg-indigo-400 rounded-full blur-[1px] animate-pulse delay-700" />
             </div>
 
-            {/* Premium Text Branding Layer */}
             <div className="relative">
               <h2 className="text-5xl font-black text-white tracking-tighter mt-1">
                 SUREZE
               </h2>
-              {/* <span className="text-xs font-bold text-blue-400 tracking-[0.3em] uppercase">
-                YOUR ICT PARTNER
-              </span> */}
               <div className="flex items-center gap-2 justify-center mt-2">
                 <div className="h-[2px] w-8 bg-gradient-to-r from-transparent to-blue-500" />
                 <span className="text-[10px] font-bold text-blue-400/80 tracking-[0.4em] uppercase">
@@ -228,7 +192,6 @@ export default function LoginPage() {
             requests, and technical operations securely.
           </p>
 
-          {/* Stats */}
           <div className="grid grid-cols-3 gap-4">
             {[
               { value: "1,718", label: "Tickets" },
@@ -270,7 +233,7 @@ export default function LoginPage() {
               Welcome back
             </h1>
             <p className="text-slate-500 dark:text-slate-400 mt-2 text-sm">
-              Sign in to your account to continue
+              Sign in to your account with your credentials
             </p>
           </div>
 
@@ -289,87 +252,48 @@ export default function LoginPage() {
             </div>
           )}
 
-          {/* Global error */}
-          {error && (
+          {/* Error messages (Local or Context) */}
+          {(localError || authContextError) && (
             <div className="mb-5 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-600 dark:text-red-400 text-sm animate-in fade-in slide-in-from-top-2">
               <AlertCircle size={16} className="flex-shrink-0" />
-              {error}
+              {localError || authContextError}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <InputField
-              id="email"
-              label="Email Address"
-              type="email"
-              value={form.email}
-              onChange={set("email")}
-              placeholder="you@example.com"
-              icon={Mail}
-              error={fieldErrors.email}
+              id="username"
+              label="Username or Email"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Enter your username"
+              icon={User}
             />
             <InputField
               id="password"
               label="Password"
               type="password"
-              value={form.password}
-              onChange={set("password")}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
               icon={Lock}
-              error={fieldErrors.password}
             />
-
-            <div className="flex items-center justify-between pt-1">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={remember}
-                  onChange={(e) => setRemember(e.target.checked)}
-                  className="w-4 h-4 rounded accent-blue-500 cursor-pointer"
-                />
-                <span className="text-sm text-slate-600 dark:text-slate-400">
-                  Remember me
-                </span>
-              </label>
-              <button
-                type="button"
-                className="text-sm text-blue-500 hover:text-blue-600 font-semibold transition-colors"
-              >
-                Forgot password?
-              </button>
-            </div>
 
             <button
               type="submit"
-              disabled={loading}
-              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-blue-500 hover:bg-blue-600 disabled:bg-blue-400 text-white font-semibold text-sm transition-all shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:-translate-y-0.5 active:translate-y-0 mt-2"
+              disabled={isLoggingIn}
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-blue-500 hover:bg-blue-600 disabled:bg-blue-400 text-white font-semibold text-sm transition-all shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 hover:-translate-y-0.5 active:translate-y-0 mt-6"
             >
-              {loading ? (
+              {isLoggingIn ? (
                 <>
-                  <Loader2 size={17} className="animate-spin" /> Signing in...
+                  <Loader2 size={17} className="animate-spin" /> Verifying...
                 </>
               ) : (
                 <>
                   Sign In <ArrowRight size={16} />
                 </>
               )}
-            </button>
-
-            <div className="relative my-6">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-slate-200 dark:border-slate-800"></div>
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-slate-50 dark:bg-[#0f1117] px-2 text-slate-500">Or continue with</span>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => oidc.signinRedirect()}
-              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 font-semibold text-sm transition-all shadow-sm hover:shadow-md"
-            >
-              Sign in with SSO
             </button>
           </form>
         </div>
