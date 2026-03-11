@@ -33,7 +33,6 @@ export const NAV_GROUPS = [
         href: "/ams-tickets",
         icon: Ticket,
       },
-      { id: "main-customers", name: "Clients", href: "/Clients", icon: Users },
     ],
   },
   {
@@ -49,6 +48,11 @@ export const NAV_GROUPS = [
             id: "sub-reports-tickets",
             name: "AMS Tickets Report",
             href: "/reports/tickets",
+          },
+          {
+            id: "sub-reports-afterhours",
+            name: "After Working Hours Report",
+            href: "/reports/after-hours",
           },
           {
             id: "sub-reports-commission",
@@ -85,23 +89,10 @@ export const NAV_GROUPS = [
     title: "Administration",
     links: [
       {
-        id: "set-profile",
+        id: "set-identity",
         name: "Identity Management",
-        href: "/profile",
         icon: UserCircle,
-      },
-      { id: "set-config", name: "Users", href: "/users", icon: Users },
-      {
-        id: "set-configuration",
-        name: "Configuration",
-        href: "/configuration",
-        icon: Settings,
-      },
-      {
-        id: "set-security",
-        name: "Security",
-        href: "/security",
-        icon: ShieldCheck,
+        subMenu: [{ id: "set-users", name: "Users", href: "/users" }],
       },
       {
         id: "set-audit",
