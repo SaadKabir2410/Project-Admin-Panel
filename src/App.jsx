@@ -16,6 +16,7 @@ import UserWorkingHoursPage from "./pages/UserWorkingHoursPage";
 import JobsheetsPage from "./pages/JobsheetsPage";
 import TicketCommissionReportPage from "./pages/TicketCommissionReportPage";
 import AMSTicketsReportPage from "./pages/AMSTicketsReportPage";
+import GeneralReportPage from "./pages/GeneralReportPage";
 import AfterWorkingHoursReportPage from "./pages/AfterWorkingHoursReportPage";
 import UsersPage from "./pages/UsersPage";
 import RolesPage from "./pages/RolesPage";
@@ -45,6 +46,7 @@ function Layout({ collapsed, setCollapsed }) {
               element={<AfterWorkingHoursReportPage />}
             />
             <Route path="/reports/tickets" element={<AMSTicketsReportPage />} />
+            <Route path="/reports/general" element={<GeneralReportPage />} />
             <Route path="/users" element={<UsersPage />} />
             <Route path="/roles" element={<RolesPage />} />
 

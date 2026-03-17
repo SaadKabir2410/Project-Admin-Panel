@@ -2,11 +2,13 @@ import apiClient from "../apiClient";
 
 export const workCodesApi = {
   getAll: () => {
-    console.log("[DB.workCodes] getAll");
-    return apiClient.get("/api/app/work-done-code").then((r) => {
-      console.log("[DB.workCodes] getAll success:", r.data);
-      return r.data;
-    });
+    const params = {
+      SkipCount: 0,
+      MaxResultCount: 1000,
+      Sorting: "Code asc",
+    };
+    return apiClient.get("/api/app/work-done-code/paged-list", { params })
+      .then((r) => r.data?.items || r.data || []);
   },
   checkCodeExists: (code, signal) => {
     const params = {

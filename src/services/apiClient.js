@@ -1,10 +1,16 @@
 import axios from 'axios';
+import qs from 'qs';
 
 const apiClient = axios.create({
   baseURL: '', // Use relative path to take advantage of Vite proxy
   headers: {
     'Accept': 'application/json',
     'X-Requested-With': 'XMLHttpRequest'
+  },
+  paramsSerializer: {
+    serialize: (params) => {
+      return qs.stringify(params, { allowDots: true, arrayFormat: 'repeat' });
+    }
   }
 });
 

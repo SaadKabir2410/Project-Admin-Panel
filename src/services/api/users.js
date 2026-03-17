@@ -62,6 +62,9 @@ export const usersApi = {
   getByEmail: (email) => apiClient.get(`/api/identity/users/by-email/${email}`).then(r => r.data),
   getCustomerUsers: (siteId) => apiClient.get(`/api/app/user/customer-users/${siteId}`).then(r => r.data),
   getUsersList: () => apiClient.get("/api/app/user/users-list").then(r => r.data),
+  getCustomerList: () => apiClient.get("/api/app/user/users-list", {
+    params: { "UserSearch.IsCustomer": true }
+  }).then(r => r.data),
   create: async (data) => {
     // Separate roles from user data
     const { roleNames, ...userData } = data;

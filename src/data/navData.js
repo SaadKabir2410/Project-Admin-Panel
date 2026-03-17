@@ -40,6 +40,11 @@ export const NAV_GROUPS = [
             href: "/reports/tickets",
           },
           {
+            id: "sub-reports-general",
+            name: "General Report",
+            href: "/reports/general",
+          },
+          {
             id: "sub-reports-afterhours",
             name: "After Working Hours Report",
             href: "/reports/after-hours",

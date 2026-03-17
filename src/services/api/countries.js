@@ -3,9 +3,14 @@ import apiClient from "../apiClient";
 export const countriesApi = {
   getAll: () => {
     console.log("[DB.countries] getAll");
-    return apiClient.get("/api/app/country").then((r) => {
+    const params = {
+      SkipCount: 0,
+      MaxResultCount: 1000,
+      Sorting: "Name asc",
+    };
+    return apiClient.get("/api/app/country/paged-list", { params }).then((r) => {
       console.log("[DB.countries] getAll success:", r.data);
-      return r.data;
+      return r.data?.items || r.data || [];
     });
   },
   create: (data) => {
