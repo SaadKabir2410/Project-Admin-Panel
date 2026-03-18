@@ -11,7 +11,6 @@ export const usersApi = {
     filterOperator,
     ...extraParams
   } = {}) => {
-    // The only supported custom param is ShowCustomers
     const params = {
       SkipCount: (page - 1) * perPage,
       MaxResultCount: perPage,
@@ -19,7 +18,10 @@ export const usersApi = {
       Sorting: sortKey ? `${sortKey} ${sortDir}` : "Name asc",
     };
 
-    if (extraParams.isCustomer !== undefined && extraParams.isCustomer !== null) {
+    if (
+      extraParams.isCustomer !== undefined &&
+      extraParams.isCustomer !== null
+    ) {
       params.ShowCustomers = extraParams.isCustomer;
     }
 
@@ -27,6 +29,7 @@ export const usersApi = {
       .get("/api/app/user/paged-list", { params })
       .then((r) => r.data);
   },
+
   getById: (id) =>
     apiClient.get(`/api/identity/users/${id}`).then((r) => r.data),
   getUsers: () => apiClient.get("/api/identity/users").then((r) => r.data),
@@ -45,7 +48,9 @@ export const usersApi = {
   getUsersList: (organizationTypes) => {
     let url = "/api/app/user/users-list";
     if (organizationTypes && Array.isArray(organizationTypes)) {
-      const q = organizationTypes.map(t => `organizationTypes=${t}`).join('&');
+      const q = organizationTypes
+        .map((t) => `organizationTypes=${t}`)
+        .join("&");
       url += `?${q}`;
     }
     return apiClient.get(url).then((r) => r.data);
@@ -56,11 +61,11 @@ export const usersApi = {
         params: { ShowCustomers: true, MaxResultCount: 1000 },
       })
       .then((r) => r.data),
+
   create: async (data) => {
-    // Separate roles from user data
     const { roleNames, ...userData } = data;
 
-    // Step 1: Build the clean payload for create
+    // FIX: All custom fields at top level, matching API contract
     const payload = {
       userName: userData.userName,
       name: userData.name,
@@ -72,31 +77,27 @@ export const usersApi = {
       twoFactorEnabled: false,
       password: userData.password,
       roleNames: roleNames ?? [],
-      extraProperties: {
-        organizationType: Number(userData.organizationType) || undefined,
-        isPrimary: userData.isPrimary ?? false,
-        mustCompleteJobsheet: userData.mustCompleteJobsheet ?? false,
-        isITS: userData.isITS ?? false,
-        baseRateFirstHourAfterWorkingHours:
-          Number(userData.baseRateFirstHourAfterWorkingHours) || 0,
-        baseRateAfterFirstHourAfterWorkingHours:
-          Number(userData.baseRateAfterFirstHourAfterWorkingHours) || 0,
-        siteId: userData.siteId ?? null,
-      },
+
+      // ✅ TOP-LEVEL fields (not inside extraProperties)
+      organizationType: Number(userData.organizationType) || 0,
+      siteId: userData.siteId ?? null,
+      isPrimary: userData.isPrimary ?? false,
+      mustCompleteJobsheet: userData.mustCompleteJobsheet ?? false,
+      isITS: userData.isITS ?? false,
+      baseRateFirstHourAfterWorkingHours:
+        Number(userData.baseRateFirstHourAfterWorkingHours) || 0,
+      baseRateAfterFirstHourAfterWorkingHours:
+        Number(userData.baseRateAfterFirstHourAfterWorkingHours) || 0,
     };
 
-    // Remove any undefined or empty string values from root and extra properties if needed,
-    // but the mapped defaults cover most cases cleanly.
     if (!payload.password?.trim()) {
-      delete payload.password; // some backends might have random password generation or don't allow empty string
+      delete payload.password;
     }
 
-    // Step 2: Create the user
     const createdUser = await apiClient
       .post("/api/identity/users", payload)
       .then((r) => r.data);
 
-    // Step 3: Assign roles separately if the POST doesn't persist them (often required by custom generic setups)
     if (roleNames && roleNames.length > 0) {
       await apiClient.put(`/api/identity/users/${createdUser.id}/roles`, {
         roleNames,
@@ -105,14 +106,14 @@ export const usersApi = {
 
     return createdUser;
   },
+
   update: async (id, data) => {
     // Step 1: Always fetch fresh concurrencyStamp before PUT
-    // Never trust the stale value from the table row
     const freshUser = await apiClient
       .get(`/api/identity/users/${id}`)
       .then((r) => r.data);
 
-    // Step 2: Build the clean payload
+    // Step 2: Build clean payload — all fields at TOP LEVEL matching API contract
     const payload = {
       userName: data.userName,
       name: data.name,
@@ -123,19 +124,20 @@ export const usersApi = {
       lockoutEnabled: data.lockoutEnabled ?? false,
       twoFactorEnabled: false,
       roleNames: data.roleNames ?? [],
-      concurrencyStamp: freshUser.concurrencyStamp, // always fresh
-      extraProperties: {
-        ...freshUser.extraProperties,
-        organizationType: Number(data.organizationType) || undefined,
-        isPrimary: data.isPrimary ?? false,
-        mustCompleteJobsheet: data.mustCompleteJobsheet ?? false,
-        isITS: data.isITS ?? false,
-        baseRateFirstHourAfterWorkingHours:
-          Number(data.baseRateFirstHourAfterWorkingHours) || 0,
-        baseRateAfterFirstHourAfterWorkingHours:
-          Number(data.baseRateAfterFirstHourAfterWorkingHours) || 0,
-        siteId: data.siteId ?? null,
-      },
+      concurrencyStamp: freshUser.concurrencyStamp, // always fresh from GET
+
+      // ✅ FIX: These must be TOP-LEVEL, NOT inside extraProperties
+      // The API validates organizationType at root level — putting it in
+      // extraProperties causes "Organization Type is required" 400 error
+      organizationType: Number(data.organizationType) || 0,
+      siteId: data.siteId ?? null,
+      isPrimary: data.isPrimary ?? false,
+      mustCompleteJobsheet: data.mustCompleteJobsheet ?? false,
+      isITS: data.isITS ?? false,
+      baseRateFirstHourAfterWorkingHours:
+        Number(data.baseRateFirstHourAfterWorkingHours) || 0,
+      baseRateAfterFirstHourAfterWorkingHours:
+        Number(data.baseRateAfterFirstHourAfterWorkingHours) || 0,
     };
 
     // Step 3: Only include password if user typed a new one
@@ -156,16 +158,14 @@ export const usersApi = {
 
       return { success: true };
     } catch (error) {
-
-      debugger;
       console.error(
         "UPDATE ERROR DETAILS:",
-        JSON.stringify(error.response?.data, null, 2)
+        JSON.stringify(error.response?.data, null, 2),
       );
-      debugger;
       throw error;
     }
   },
+
   delete: (id) =>
     apiClient.delete(`/api/identity/users/${id}`).then((r) => r.data),
 };

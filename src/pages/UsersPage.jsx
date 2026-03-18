@@ -1,7 +1,10 @@
 import { useState, useMemo, useEffect } from "react";
 import ResourcePage from "../component/common/ResourcePage";
 import { usersApi } from "../services/api/users";
-import { ORGANIZATION_TYPES, getOrganizationTypeName } from "../constants/userTypes";
+import {
+  ORGANIZATION_TYPES,
+  getOrganizationTypeName,
+} from "../constants/userTypes";
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -22,10 +25,11 @@ export default function UsersPage() {
     mustCompleteJobsheet: false,
     isITS: false,
     onlyLoadCurrentUser: false,
-    organizationTypes: "" // Default to all, blank string for select
+    organizationTypes: "",
   });
 
-  const toggleFilter = (key) => setFilters(prev => ({ ...prev, [key]: !prev[key] }));
+  const toggleFilter = (key) =>
+    setFilters((prev) => ({ ...prev, [key]: !prev[key] }));
 
   const columns = useMemo(
     () => [
@@ -73,7 +77,7 @@ export default function UsersPage() {
         render: (val, row) => (
           <div className="flex items-center justify-center">
             <div
-              className={`w-3 h-3 rounded-full ${val ?? row?.extraProperties?.isPrimary ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "bg-slate-200 dark:bg-white/10"}`}
+              className={`w-3 h-3 rounded-full ${(val ?? row?.extraProperties?.isPrimary) ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "bg-slate-200 dark:bg-white/10"}`}
             />
           </div>
         ),
@@ -84,24 +88,25 @@ export default function UsersPage() {
 
   const customFilterArea = (
     <div className="flex flex-wrap items-center gap-3 bg-transparent px-3 py-2 rounded-xl border border-slate-200 dark:border-white/10 w-fit">
-
-      {/* Show Customer Toggle */}
       <div className="flex items-center gap-2">
-        <span className="text-[10px] text-slate-500 whitespace-nowrap hidden sm:inline">Show Customer</span>
-        <span className="text-[10px] text-slate-500 whitespace-nowrap sm:hidden">Customer</span>
+        <span className="text-[10px] text-slate-500 whitespace-nowrap hidden sm:inline">
+          Show Customer
+        </span>
+        <span className="text-[10px] text-slate-500 whitespace-nowrap sm:hidden">
+          Customer
+        </span>
         <button
-          onClick={() => toggleFilter('isCustomer')}
-          className={`relative w-8 h-4 rounded-full transition-colors duration-200 focus:outline-none shrink-0 ${filters.isCustomer ? "bg-blue-500" : "bg-slate-300 dark:bg-slate-700"
-            }`}
+          onClick={() => toggleFilter("isCustomer")}
+          className={`relative w-8 h-4 rounded-full transition-colors duration-200 focus:outline-none shrink-0 ${filters.isCustomer ? "bg-blue-500" : "bg-slate-300 dark:bg-slate-700"}`}
         >
-          <div className={`absolute top-0.5 left-0.5 w-3 h-3 bg-white rounded-full transition-transform duration-200 ${filters.isCustomer ? "translate-x-4" : "translate-x-0"}`} />
+          <div
+            className={`absolute top-0.5 left-0.5 w-3 h-3 bg-white rounded-full transition-transform duration-200 ${filters.isCustomer ? "translate-x-4" : "translate-x-0"}`}
+          />
         </button>
       </div>
-
     </div>
   );
 
-  // Modal for Creating/Editing a User
   const UserModal = ({
     open,
     onClose,
@@ -111,7 +116,6 @@ export default function UsersPage() {
     submitError,
   }) => {
     const [tabIndex, setTabIndex] = useState(0);
-    // Track roles manually, default to an empty array or existing ones
     const [selectedRoles, setSelectedRoles] = useState([]);
     const [availableRoles, setAvailableRoles] = useState([]);
     const [validationErrors, setValidationErrors] = useState({});
@@ -126,12 +130,12 @@ export default function UsersPage() {
     const [selectedSite, setSelectedSite] = useState(null);
 
     useEffect(() => {
-      apiClient.get('/api/app/site', { params: { MaxResultCount: 1000 } })
-        .then(res => setSites(res.data?.items || res.data || []))
-        .catch(err => console.error("Error fetching sites:", err));
+      apiClient
+        .get("/api/app/site/", { params: { MaxResultCount: 1000 } })
+        .then((res) => setSites(res.data?.items || res.data || []))
+        .catch((err) => console.error("Error fetching sites:", err));
     }, []);
 
-    // When the modal opens/item changes, load data if editing
     useEffect(() => {
       if (open) {
         setTabIndex(0);
@@ -139,7 +143,6 @@ export default function UsersPage() {
         setValidationErrors({});
         setShowPassword(false);
 
-        // Fetch assignable roles dynamically
         usersApi
           .getAssignableRoles()
           .then((res) => setAvailableRoles(res.items || res || []))
@@ -159,19 +162,24 @@ export default function UsersPage() {
           ])
             .then(([userRes, rolesRes]) => {
               const loadedUser = userRes || item;
-              const mergedUser = loadedUser ? { ...loadedUser, ...(loadedUser.extraProperties || {}) } : null;
+              const mergedUser = loadedUser
+                ? { ...loadedUser, ...(loadedUser.extraProperties || {}) }
+                : null;
               setUserData(mergedUser);
-              const orgTypeVal = mergedUser?.organizationType;
-              setOrgType(orgTypeVal && orgTypeVal !== 0 ? orgTypeVal.toString() : "");
 
-              // Parse roles intelligently from whatever shape it returns
+              const orgTypeVal = mergedUser?.organizationType;
+              setOrgType(
+                orgTypeVal != null && orgTypeVal !== 0
+                  ? orgTypeVal.toString()
+                  : "",
+              );
+
               let rolesArray = [];
               if (rolesRes) {
                 rolesArray = rolesRes.items || rolesRes || [];
               } else if (item.roleNames) {
                 rolesArray = item.roleNames;
               }
-
               setSelectedRoles(rolesArray.map((r) => r.name || r));
             })
             .catch((error) => {
@@ -192,7 +200,7 @@ export default function UsersPage() {
       }
     }, [open, item]);
 
-    // Bind selected site once data is loaded
+    // Bind selected site once data + sites are loaded
     useEffect(() => {
       if (!userData?.siteId || sites.length === 0) {
         if (!userData?.siteId) setSelectedSite(null);
@@ -221,7 +229,7 @@ export default function UsersPage() {
       const formData = new FormData(e.target);
       const data = Object.fromEntries(formData.entries());
 
-      // Custom Validation
+      // Validation
       const errors = {};
       if (!data.userName?.trim())
         errors.userName = "The User name field is required";
@@ -230,70 +238,65 @@ export default function UsersPage() {
         errors.password = "The Password field is required";
       if (!data.phoneNumber?.trim())
         errors.phoneNumber = "The Phone number field is required";
-      if (
-        !data.organizationType ||
-        data.organizationType === "" ||
-        data.organizationType === "0" ||
-        data.organizationType === 0
-      ) {
+      if (!orgType || orgType === "" || orgType === "0") {
         errors.organizationType = "The Organization Type field is required";
       }
-
-      if (data.organizationType === "1" && !selectedSite) {
+      if (orgType === "1" && !selectedSite) {
         errors.siteId = "Site is required for Customer organization type";
       }
 
       if (Object.keys(errors).length > 0) {
         setValidationErrors(errors);
-        setTabIndex(0); // Make sure they see the errors
+        setTabIndex(0);
         return;
       }
 
       setValidationErrors({});
 
-      // Handle checkboxes properly
-      data.isActive = formData.get("isActive") === "on";
-      data.lockoutEnabled = formData.get("lockoutEnabled") === "on";
-      data.isPrimary = formData.get("isPrimary") === "on";
-      data.isITS = formData.get("isITS") === "on";
-      data.mustCompleteJobsheet = formData.get("mustCompleteJobsheet") === "on";
+      // Build clean payload matching API contract exactly
+      const payload = {
+        userName: data.userName?.trim(),
+        name: data.name?.trim(),
+        surname: data.surname?.trim() || "",
+        email: data.email?.trim() || "",
+        phoneNumber: data.phoneNumber?.trim(),
 
-      if (data.baseRateFirstHourAfterWorkingHours) {
-        data.baseRateFirstHourAfterWorkingHours = parseFloat(
-          data.baseRateFirstHourAfterWorkingHours,
-        );
-      }
-      if (data.baseRateAfterFirstHourAfterWorkingHours) {
-        data.baseRateAfterFirstHourAfterWorkingHours = parseFloat(
-          data.baseRateAfterFirstHourAfterWorkingHours,
-        );
-      }
+        // FIX 1: Always use orgType (controlled state), not formData value
+        // formData.get("organizationType") can be stale; orgType is always current
+        organizationType: Number(orgType),
 
-      // Include roles array
-      data.roleNames = selectedRoles;
+        // FIX 2: Only send siteId when orgType is Customer (1), otherwise null
+        siteId: orgType === "1" && selectedSite ? selectedSite.id : null,
 
-      // If editing, only send password if user typed a new one
-      if (item && !data.password) {
-        delete data.password;
-      }
+        isPrimary: formData.get("isPrimary") === "on",
+        mustCompleteJobsheet: formData.get("mustCompleteJobsheet") === "on",
+        isITS: formData.get("isITS") === "on",
+        isActive: formData.get("isActive") === "on",
+        lockoutEnabled: formData.get("lockoutEnabled") === "on",
 
-      if (data.organizationType !== undefined && data.organizationType !== "") {
-        data.organizationType = Number(data.organizationType);
-      }
+        baseRateFirstHourAfterWorkingHours:
+          parseFloat(data.baseRateFirstHourAfterWorkingHours) || 0,
+        baseRateAfterFirstHourAfterWorkingHours:
+          parseFloat(data.baseRateAfterFirstHourAfterWorkingHours) || 0,
 
-      // Include siteId or clear it based on organizationType
-      data.siteId = (data.organizationType === 1 && selectedSite) ? selectedSite.id : null;
+        roleNames: selectedRoles,
+      };
 
-      // If editing, carry over server-required fields
-      if (userData) {
-        data.concurrencyStamp = userData.concurrencyStamp;
-        data.id = userData.id;
-      } else if (item) {
-        data.concurrencyStamp = item.concurrencyStamp;
-        data.id = item.id;
+      // FIX 3: Password — only include if provided
+      if (data.password?.trim()) {
+        payload.password = data.password.trim();
       }
 
-      onSubmit(data);
+      // FIX 4: concurrencyStamp — MUST come from the GET response (userData),
+      // not the list item. Missing or wrong stamp = 400 Bad Request.
+      if (item) {
+        payload.concurrencyStamp =
+          userData?.concurrencyStamp ?? item.concurrencyStamp;
+      }
+
+      console.log("[DEBUG] PUT payload:", JSON.stringify(payload, null, 2));
+
+      onSubmit(payload);
     };
 
     return (
@@ -349,8 +352,6 @@ export default function UsersPage() {
               {/* TAB 1: USER INFORMATION */}
               <div style={{ display: tabIndex === 0 ? "block" : "none" }}>
                 <div className="flex flex-col gap-2 mb-4">
-                  {" "}
-                  {/* Changed to flex flex-col for vertical layout */}
                   <div>
                     <label className="block text-[10px] text-slate-500 mb-1 ml-1">
                       User name *
@@ -447,7 +448,10 @@ export default function UsersPage() {
                       </p>
                     )}
                   </div>
-                  <div className={`grid ${orgType === "1" ? "grid-cols-2 gap-3" : "grid-cols-1"}`}>
+
+                  <div
+                    className={`grid ${orgType === "1" ? "grid-cols-2 gap-3" : "grid-cols-1"}`}
+                  >
                     <div className="w-full">
                       <label className="block text-[10px] text-slate-500 mb-1 ml-1">
                         Organization Type *
@@ -488,101 +492,122 @@ export default function UsersPage() {
                         <Autocomplete
                           size="small"
                           options={sites}
-                          getOptionLabel={(option) => option.name || option.Name || String(option.id || "")}
-                          isOptionEqualToValue={(option, value) => option.id === value?.id}
+                          // FIX 5: Use option.id as the key, not the name — prevents duplicate key warnings
+                          getOptionKey={(option) => option.id}
+                          getOptionLabel={(option) =>
+                            option.name ||
+                            option.Name ||
+                            String(option.id || "")
+                          }
+                          isOptionEqualToValue={(option, value) =>
+                            option.id === value?.id
+                          }
                           value={selectedSite}
                           onChange={(e, newValue) => {
                             setSelectedSite(newValue);
                           }}
                           slotProps={{
                             popper: {
-                              placement: 'bottom-start',
+                              placement: "bottom-start",
                               modifiers: [
-                                { name: 'flip', enabled: false },
-                                { name: 'preventOverflow', enabled: false }
-                              ]
+                                { name: "flip", enabled: false },
+                                { name: "preventOverflow", enabled: false },
+                              ],
                             },
                             paper: {
                               sx: {
                                 mt: 1,
-                                borderRadius: '0.75rem',
-                                boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
-                                border: '1px solid #e2e8f0',
-                                '.dark &': {
-                                  border: '1px solid rgba(255,255,255,0.1)',
-                                  backgroundColor: '#1e2436',
-                                }
-                              }
-                            }
+                                borderRadius: "0.75rem",
+                                boxShadow:
+                                  "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)",
+                                border: "1px solid #e2e8f0",
+                                ".dark &": {
+                                  border: "1px solid rgba(255,255,255,0.1)",
+                                  backgroundColor: "#1e2436",
+                                },
+                              },
+                            },
                           }}
                           ListboxProps={{
                             sx: {
-                              maxHeight: '160px',
-                              fontSize: '0.875rem',
-                              padding: '0.5rem',
-                              '&::-webkit-scrollbar': { display: 'none' },
-                              msOverflowStyle: 'none',
-                              scrollbarWidth: 'none',
-                              '& .MuiAutocomplete-option': {
-                                borderRadius: '0.5rem',
-                                padding: '6px 12px',
-                                minHeight: 'auto',
-                              }
-                            }
-                          }}
-                        renderInput={(params) => (
-                          <TextField
-                            {...params}
-                            placeholder="Select Site"
-                            sx={{
-                              '& .MuiOutlinedInput-root': {
-                                borderRadius: '0.5rem',
-                                fontSize: '0.875rem',
-                                padding: '0px 9px !important',
-                                minHeight: '34px',
-                                backgroundColor: 'transparent',
-                                transition: 'all 0.2s',
-                                '& fieldset': {
-                                  borderColor: validationErrors.siteId ? '#ef4444' : '#e2e8f0',
-                                  transition: 'all 0.2s',
-                                },
-                                '&:hover fieldset': {
-                                  borderColor: validationErrors.siteId ? '#ef4444' : '#cbd5e1',
-                                },
-                                '&.Mui-focused fieldset': {
-                                  borderColor: validationErrors.siteId ? '#ef4444' : '#e2e8f0',
-                                  borderWidth: '1px !important',
-                                  boxShadow: validationErrors.siteId 
-                                    ? '0 0 0 2px rgba(239, 68, 68, 0.2)' 
-                                    : '0 0 0 2px rgba(59, 130, 246, 0.2)',
-                                },
-                                '.dark & fieldset': {
-                                  borderColor: validationErrors.siteId ? '#ef4444' : 'rgba(255, 255, 255, 0.1)',
-                                },
-                                '.dark &:hover fieldset': {
-                                  borderColor: validationErrors.siteId ? '#ef4444' : 'rgba(255, 255, 255, 0.2)',
-                                },
-                                '.dark &.Mui-focused fieldset': {
-                                  borderColor: validationErrors.siteId ? '#ef4444' : 'rgba(255, 255, 255, 0.1)',
-                                  borderWidth: '1px !important',
-                                }
+                              maxHeight: "160px",
+                              fontSize: "0.875rem",
+                              padding: "0.5rem",
+                              "&::-webkit-scrollbar": { display: "none" },
+                              msOverflowStyle: "none",
+                              scrollbarWidth: "none",
+                              "& .MuiAutocomplete-option": {
+                                borderRadius: "0.5rem",
+                                padding: "6px 12px",
+                                minHeight: "auto",
                               },
-                              '& .MuiInputBase-input': {
-                                padding: '6px 0px !important',
-                                height: 'auto',
-                                color: 'inherit'
-                              }
-                            }}
-                          />
+                            },
+                          }}
+                          renderInput={(params) => (
+                            <TextField
+                              {...params}
+                              placeholder="Select Site"
+                              sx={{
+                                "& .MuiOutlinedInput-root": {
+                                  borderRadius: "0.5rem",
+                                  fontSize: "0.875rem",
+                                  padding: "0px 9px !important",
+                                  minHeight: "34px",
+                                  backgroundColor: "transparent",
+                                  transition: "all 0.2s",
+                                  "& fieldset": {
+                                    borderColor: validationErrors.siteId
+                                      ? "#ef4444"
+                                      : "#e2e8f0",
+                                    transition: "all 0.2s",
+                                  },
+                                  "&:hover fieldset": {
+                                    borderColor: validationErrors.siteId
+                                      ? "#ef4444"
+                                      : "#cbd5e1",
+                                  },
+                                  "&.Mui-focused fieldset": {
+                                    borderColor: validationErrors.siteId
+                                      ? "#ef4444"
+                                      : "#e2e8f0",
+                                    borderWidth: "1px !important",
+                                    boxShadow: validationErrors.siteId
+                                      ? "0 0 0 2px rgba(239, 68, 68, 0.2)"
+                                      : "0 0 0 2px rgba(59, 130, 246, 0.2)",
+                                  },
+                                  ".dark & fieldset": {
+                                    borderColor: validationErrors.siteId
+                                      ? "#ef4444"
+                                      : "rgba(255, 255, 255, 0.1)",
+                                  },
+                                  ".dark &:hover fieldset": {
+                                    borderColor: validationErrors.siteId
+                                      ? "#ef4444"
+                                      : "rgba(255, 255, 255, 0.2)",
+                                  },
+                                  ".dark &.Mui-focused fieldset": {
+                                    borderColor: validationErrors.siteId
+                                      ? "#ef4444"
+                                      : "rgba(255, 255, 255, 0.1)",
+                                    borderWidth: "1px !important",
+                                  },
+                                },
+                                "& .MuiInputBase-input": {
+                                  padding: "6px 0px !important",
+                                  height: "auto",
+                                  color: "inherit",
+                                },
+                              }}
+                            />
+                          )}
+                        />
+                        {validationErrors.siteId && (
+                          <p className="text-red-500 text-[9px] mt-1 ml-1">
+                            {validationErrors.siteId}
+                          </p>
                         )}
-                      />
-                      {validationErrors.siteId && (
-                        <p className="text-red-500 text-[9px] mt-1 ml-1">
-                          {validationErrors.siteId}
-                        </p>
-                      )}
-                    </div>
-                  )}
+                      </div>
+                    )}
                   </div>
 
                   <div>
@@ -615,10 +640,8 @@ export default function UsersPage() {
                   </div>
                 </div>
 
-                {/* Checkboxes for boolean settings */}
+                {/* Checkboxes */}
                 <div className="flex flex-col gap-2 bg-transparent rounded-xl p-3 border border-slate-200 dark:border-white/10">
-                  {" "}
-                  {/* Changed to flex flex-col */}
                   <label className="flex items-center gap-3 cursor-pointer">
                     <input
                       type="checkbox"
@@ -650,7 +673,9 @@ export default function UsersPage() {
                     <input
                       type="checkbox"
                       name="lockoutEnabled"
-                      defaultChecked={userData ? userData.lockoutEnabled : false}
+                      defaultChecked={
+                        userData ? userData.lockoutEnabled : false
+                      }
                       className="w-4 h-4 rounded text-blue-600 border-slate-300"
                     />
                     <span className="text-sm text-slate-700">
@@ -711,7 +736,6 @@ export default function UsersPage() {
                       );
                     })}
 
-                  {/* Pagination Controls */}
                   {availableRoles.length > rolesPerPage && (
                     <div className="flex justify-between items-center mt-6 pt-4 border-t border-slate-100">
                       <div className="flex gap-1.5">
@@ -780,7 +804,7 @@ export default function UsersPage() {
 
               {submitError && (
                 <div className="mt-6 p-4 bg-rose-50 border border-rose-200 rounded-xl">
-                  <p className="text-xs text-rose-500 ">Error: {submitError}</p>
+                  <p className="text-xs text-rose-500">Error: {submitError}</p>
                 </div>
               )}
             </div>
@@ -790,14 +814,14 @@ export default function UsersPage() {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 py-2 text-xs rounded-xl bg-transparent border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors "
+              className="flex-1 py-2 text-xs rounded-xl bg-transparent border border-slate-200 dark:border-white/10 text-slate-500 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-white/5 transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 py-2 text-xs rounded-xl bg-transparent border border-blue-600 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 disabled:opacity-50 transition-all duration-200 "
+              className="flex-1 py-2 text-xs rounded-xl bg-transparent border border-blue-600 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 disabled:opacity-50 transition-all duration-200"
             >
               {loading ? "Wait..." : item ? "Save" : "Create"}
             </button>
@@ -827,7 +851,9 @@ export default function UsersPage() {
         mustCompleteJobsheet: filters.mustCompleteJobsheet ? true : undefined,
         isITS: filters.isITS ? true : undefined,
         onlyLoadCurrentUser: filters.onlyLoadCurrentUser ? true : undefined,
-        organizationTypes: filters.organizationTypes ? [parseInt(filters.organizationTypes, 10)] : undefined
+        organizationTypes: filters.organizationTypes
+          ? [parseInt(filters.organizationTypes, 10)]
+          : undefined,
       }}
       showAuditLog={false}
     />
