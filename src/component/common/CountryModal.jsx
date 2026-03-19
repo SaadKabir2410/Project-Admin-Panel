@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Dialog, IconButton } from "@mui/material";
-import { X, Loader2, Check } from "lucide-react";
+
 
 const EMPTY = { name: "", code: "" };
 
@@ -89,7 +89,7 @@ export default function CountryModal({
           {isEdit ? "Update Country" : "Create Country"}
         </h2>
         <IconButton onClick={onClose} size="small">
-          <X size={20} />
+          
         </IconButton>
       </div>
 
@@ -175,13 +175,7 @@ export default function CountryModal({
           disabled={loading}
           className="px-8 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm flex items-center justify-center min-w-[120px] disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-blue-100 dark:shadow-none transition-all"
         >
-          {loading ? (
-            <Loader2 size={18} className="animate-spin" />
-          ) : isEdit ? (
-            "Update"
-          ) : (
-            "Create"
-          )}
+          {loading ? "Saving..." : isEdit ? "Update" : "Create"}
         </button>
       </div>
     </Dialog>

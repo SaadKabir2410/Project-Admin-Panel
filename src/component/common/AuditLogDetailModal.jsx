@@ -1,5 +1,5 @@
 import { Dialog, IconButton, Box, Typography, Paper } from "@mui/material";
-import { X, History, Info, ArrowRight } from "lucide-react";
+
 import { DataGrid } from "@mui/x-data-grid";
 
 const OPERATION_LABELS = {

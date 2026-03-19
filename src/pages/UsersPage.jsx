@@ -15,7 +15,7 @@ import Button from "@mui/material/Button";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
-import { Eye, EyeOff, X } from "lucide-react";
+
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import apiClient from "../services/apiClient";
@@ -354,7 +354,7 @@ export default function UsersPage() {
             onClick={onClose}
             className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors rounded-lg hover:bg-slate-100 dark:hover:bg-white/5"
           >
-            <X size={20} />
+            
           </button>
         </div>
 
@@ -448,11 +448,7 @@ export default function UsersPage() {
                         onClick={() => setShowPassword(!showPassword)}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-blue-500 transition-colors"
                       >
-                        {showPassword ? (
-                          <EyeOff size={14} strokeWidth={2.5} />
-                        ) : (
-                          <Eye size={14} strokeWidth={2.5} />
-                        )}
+                        {showPassword ? "Hide" : "Show"}
                       </button>
                     </div>
                     {validationErrors.password && (

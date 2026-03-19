@@ -1,13 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  ArrowLeft,
-  RotateCcw,
-  FileText,
-  ArrowLeftRight,
-  Download,
-  MoreVertical,
-} from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import {
   Autocomplete,
   TextField,
@@ -20,7 +13,7 @@ import countriesApi from "../services/api/countries";
 import usersApi from "../services/api/users";
 import workCodesApi from "../services/api/workCodes";
 import ticketsApi from "../services/api/tickets";
-import { Loader2 } from "lucide-react";
+
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 
 const STATUS_OPTIONS = [
@@ -408,7 +401,7 @@ export default function AMSTicketsReportPage() {
           size="small"
           onClick={(e) => handleActionClick(e, params.row)}
         >
-          <MoreVertical size={18} />
+          
         </IconButton>
       ),
     },
@@ -444,7 +437,7 @@ export default function AMSTicketsReportPage() {
                 onClick={() => navigate(-1)}
                 className="p-2 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-slate-400 hover:text-blue-500 hover:border-blue-500/30 transition-all active:scale-95 shadow-sm"
               >
-                <ArrowLeft size={18} />
+                <ArrowLeft size={16} strokeWidth={2.5} />
               </button>
               <div>
                 <h1 className="text-2xl text-slate-800 dark:text-white leading-none">
@@ -467,11 +460,6 @@ export default function AMSTicketsReportPage() {
                 disabled={loading}
                 className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-lg text-[11px] transition-all active:scale-95 shadow-sm focus:outline-none"
               >
-                {loading ? (
-                  <Loader2 size={14} className="animate-spin" />
-                ) : (
-                  <FileText size={14} />
-                )}
                 {loading ? "Loading..." : "Get Report"}
               </button>
 
@@ -480,11 +468,6 @@ export default function AMSTicketsReportPage() {
                 disabled={loading}
                 className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-lg text-[11px] transition-all active:scale-95 shadow-sm focus:outline-none"
               >
-                {loading ? (
-                  <Loader2 size={14} className="animate-spin" />
-                ) : (
-                  <Download size={14} />
-                )}
                 {loading ? "Exporting..." : "Excel Report"}
               </button>
 
@@ -820,44 +803,7 @@ export default function AMSTicketsReportPage() {
         </div>
       </div>
 
-      <Menu
-        anchorEl={anchorEl}
-        open={Boolean(anchorEl)}
-        onClose={handleActionClose}
-        PaperProps={{
-          sx: {
-            mt: 1,
-            borderRadius: "12px",
-            boxShadow: "0 10px 15px -3px rgba(0,0,0,0.1)",
-            minWidth: 140,
-          },
-        }}
-      >
-        <MenuItem
-          onClick={() => handleStatusUpdate("Open", 0)}
-          sx={{ fontSize: "14px", fontWeight: 600, py: 1.5 }}
-        >
-          Open
-        </MenuItem>
-        <MenuItem
-          onClick={() => handleStatusUpdate("Close", 1)}
-          sx={{ fontSize: "14px", fontWeight: 600, py: 1.5 }}
-        >
-          Close
-        </MenuItem>
-        <MenuItem
-          onClick={() => handleStatusUpdate("Void", 2)}
-          sx={{ fontSize: "14px", fontWeight: 600, py: 1.5 }}
-        >
-          Void
-        </MenuItem>
-        <MenuItem
-          onClick={() => handleStatusUpdate("Re-Open", 0)}
-          sx={{ fontSize: "14px", fontWeight: 600, py: 1.5 }}
-        >
-          Re-Open
-        </MenuItem>
-      </Menu>
+      
     </div>
   );
 }

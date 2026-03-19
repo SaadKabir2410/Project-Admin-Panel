@@ -10,7 +10,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import CircularProgress from "@mui/material/CircularProgress";
-import { CheckCircle2 } from "lucide-react";
+
 
 const PermissionTree = ({
   permissions,

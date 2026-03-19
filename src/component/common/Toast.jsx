@@ -1,11 +1,13 @@
 import { useState, useCallback } from "react";
-import { CheckCircle2, XCircle, X, AlertCircle } from "lucide-react";
+import { CheckCircle2, XCircle, AlertCircle, X } from "lucide-react"; // ✅ added
 
 import { ToastContext } from "./ToastContext";
+
 let toastId = 0;
 
 export function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([]);
+
   const add = useCallback((message, type = "success") => {
     const id = ++toastId;
     setToasts((t) => [...t, { id, message, type }]);
@@ -13,6 +15,7 @@ export function ToastProvider({ children }) {
   }, []);
 
   const remove = (id) => setToasts((t) => t.filter((x) => x.id !== id));
+
   const icons = {
     success: <CheckCircle2 size={16} className="text-emerald-500 shrink-0" />,
     error: <XCircle size={16} className="text-red-500 shrink-0" />,
@@ -22,7 +25,6 @@ export function ToastProvider({ children }) {
   return (
     <ToastContext.Provider value={{ toast: add }}>
       {children}
-      {/* Toast container */}
       <div className="fixed bottom-5 right-5 z-100 flex flex-col gap-2 pointer-events-none">
         {toasts.map((t) => (
           <div
@@ -37,7 +39,7 @@ export function ToastProvider({ children }) {
               onClick={() => remove(t.id)}
               className="text-slate-400 hover:text-slate-600 transition-colors"
             >
-              <X size={14} />
+              <X size={14} /> {/* ✅ replaced blank with X icon */}
             </button>
           </div>
         ))}

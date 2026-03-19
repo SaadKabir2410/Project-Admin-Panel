@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, RotateCcw, FileText } from "lucide-react";
+import { RotateCcw, FileText, ArrowLeft } from "lucide-react";
 
 const STATUS_OPTIONS = ["All", "Open", "Closed", "Void"];
 const SERVICE_PLANNED_TYPES = [
@@ -68,7 +68,7 @@ export default function TicketCommissionReportPage() {
                 onClick={() => navigate(-1)}
                 className="p-3 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl text-slate-400 hover:text-blue-500 hover:border-blue-500/30 transition-all active:scale-95 shadow-sm"
               >
-                <ArrowLeft size={22} />
+                <ArrowLeft size={18} />
               </button>
               <div>
                 <h1 className="text-3xl text-slate-800 dark:text-white leading-none">

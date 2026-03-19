@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Activity, Database } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -16,22 +17,7 @@ import {
   Pagination,
   Skeleton,
 } from "@mui/material";
-import {
-  ChevronDown,
-  ChevronUp,
-  History,
-  User,
-  Calendar,
-  ExternalLink,
-  Search,
-  SlidersHorizontal,
-  Info,
-  ShieldCheck,
-  Activity,
-  Database,
-  ChevronsLeft,
-  ChevronsRight,
-} from "lucide-react";
+
 import { AuditLogDetailsContent } from "./AuditLogDetailModal";
 
 const OPERATION_COLORS = {
@@ -75,7 +61,7 @@ function CollapsibleRow({ row }) {
       >
         <TableCell width={50}>
           <IconButton size="small">
-            {open ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+            {open ? "-" : "+"}
           </IconButton>
         </TableCell>
         <TableCell>
@@ -156,7 +142,6 @@ function CollapsibleRow({ row }) {
               }}
             >
               <div className="flex items-center gap-2 mb-6">
-                <ShieldCheck size={18} className="text-blue-500" />
                 <Typography variant="subtitle2" className=" text-slate-800 ">
                   Detailed Audit Information
                 </Typography>
@@ -205,73 +190,30 @@ export default function CollapsibleAuditLogTable({
   return (
     <div className="flex flex-col h-full overflow-hidden bg-white dark:bg-transparent">
       <TableContainer className="flex-1 overflow-auto">
-        <Table stickyHeader aria-label="collapsible table" size="medium">
+        <Table stickyHeader sx={{ minWidth: 800 }}>
           <TableHead>
-            <TableRow>
-              <TableCell
-                style={{
-                  backgroundColor: "#f8fafc",
-                  borderBottom: "2px solid #e2e8f0",
-                }}
-                width={50}
-              />
-              <TableCell
-                style={{
-                  backgroundColor: "#f8fafc",
-                  borderBottom: "2px solid #e2e8f0",
-                }}
-              >
-                <span className="text-[10px] text-slate-500">
-                  Operation Type
-                </span>
-              </TableCell>
-              <TableCell
-                style={{
-                  backgroundColor: "#f8fafc",
-                  borderBottom: "2px solid #e2e8f0",
-                }}
-              >
-                <span className="text-[10px] text-slate-500">Primary Key</span>
-              </TableCell>
-              <TableCell
-                style={{
-                  backgroundColor: "#f8fafc",
-                  borderBottom: "2px solid #e2e8f0",
-                }}
-              >
-                <span className="text-[10px] text-slate-500">Entity Name</span>
-              </TableCell>
-              <TableCell
-                style={{
-                  backgroundColor: "#f8fafc",
-                  borderBottom: "2px solid #e2e8f0",
-                }}
-              >
-                <span className="text-[10px] text-slate-500">Schema Name</span>
-              </TableCell>
-              <TableCell
-                style={{
-                  backgroundColor: "#f8fafc",
-                  borderBottom: "2px solid #e2e8f0",
-                }}
-              >
-                <span className="text-[10px] text-slate-500">User</span>
-              </TableCell>
-              <TableCell
-                style={{
-                  backgroundColor: "#f8fafc",
-                  borderBottom: "2px solid #e2e8f0",
-                }}
-                align="right"
-              >
-                <span className="text-[10px] text-slate-500">Date & Time</span>
-              </TableCell>
+            <TableRow sx={{ "& th": { bgcolor: "rgba(248, 250, 252, 0.9)", borderBottom: "2px solid #e2e8f0" } }}>
+              <TableCell width={50} />
+              <TableCell className="text-xs text-slate-500 tracking-wider">OPERATION</TableCell>
+              <TableCell className="text-xs text-slate-500 tracking-wider">RECORD KEY</TableCell>
+              <TableCell className="text-xs text-slate-500 tracking-wider">TYPE</TableCell>
+              <TableCell className="text-xs text-slate-500 tracking-wider">NAMESPACE</TableCell>
+              <TableCell className="text-xs text-slate-500 tracking-wider">ACTOR</TableCell>
+              <TableCell align="right" className="text-xs text-slate-500 tracking-wider">TIMESTAMP</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {data.map((row) => (
-              <CollapsibleRow key={row.id} row={row} />
-            ))}
+            {(!data || data.length === 0) && !loading ? (
+              <TableRow>
+                <TableCell colSpan={7} className="text-center py-20 text-slate-400">
+                  No audit logs found.
+                </TableCell>
+              </TableRow>
+            ) : (
+              data.map((row, index) => (
+                <CollapsibleRow key={row.id || index} row={row} />
+              ))
+            )}
           </TableBody>
         </Table>
       </TableContainer>
@@ -311,7 +253,7 @@ export default function CollapsibleAuditLogTable({
             disabled={page === 1 || loading}
             className="p-2.5 rounded-xl border border-slate-200 disabled:opacity-30 hover:bg-white transition-all shadow-sm"
           >
-            <ChevronsLeft size={18} />
+            
           </button>
           <button
             onClick={handlePrevPage}
@@ -337,7 +279,7 @@ export default function CollapsibleAuditLogTable({
             disabled={page >= totalPages || loading}
             className="p-2.5 rounded-xl border border-slate-200 disabled:opacity-30 hover:bg-white transition-all shadow-sm"
           >
-            <ChevronsRight size={18} />
+            
           </button>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { Plus } from "lucide-react";
+
 import ResourcePage from "../component/common/ResourcePage";
 import { ticketsApi } from "../services/api/tickets";
 import TicketModal from "../component/common/TicketModal";
@@ -64,7 +64,7 @@ export default function AMSTicketsPage() {
         <div
           className={`w-5 h-5 rounded-md flex items-center justify-center border ${val ? "bg-purple-500 border-purple-500 text-white" : "border-slate-200 dark:border-white/10"}`}
         >
-          {val && <Plus size={12} strokeWidth={4} />}
+          {val ? "Yes" : ""}
         </div>
       ),
     },

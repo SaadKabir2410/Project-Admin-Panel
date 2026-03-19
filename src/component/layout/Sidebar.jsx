@@ -1,55 +1,10 @@
 import { useState } from "react";
-import {
-  LayoutDashboard,
-  LayoutGrid,
-  FileText,
-  Users,
-  PenSquare,
-  ShoppingBag,
-  MessageSquare,
-  StickyNote,
-  Calendar,
-  UserCircle,
-  UserSquare,
-  Mail,
-  Ticket,
-  Kanban,
-  ChevronDown,
-  ChevronRight,
-  LogOut,
-  Layers,
-  History,
-} from "lucide-react";
 
 import clsx from "clsx";
 import { NAV_GROUPS } from "../../data/navData";
 import { useAuth } from "../../context/AuthContextHook";
+import { ChevronDown } from "lucide-react";
 
-const ICON_MAP = {
-  LayoutDashboard,
-  LayoutGrid,
-  FileText,
-  Users,
-  PenSquare,
-  ShoppingBag,
-  MessageSquare,
-  StickyNote,
-  Calendar,
-  UserCircle,
-  UserSquare,
-  Mail,
-  Ticket,
-  Kanban,
-  ChevronDown,
-  ChevronRight,
-  LogOut,
-  Layers,
-  History,
-};
-function NavIcon({ name, size = 18 }) {
-  const Comp = ICON_MAP[name] || LayoutDashboard;
-  return <Comp size={size} />;
-}
 
 export default function Sidebar({ collapsed }) {
   const { user } = useAuth();
@@ -57,6 +12,10 @@ export default function Sidebar({ collapsed }) {
   const filteredGroups = NAV_GROUPS.map((group) => {
     const validLinks = group.links
       .filter((link) => {
+        const isAdmin = user?.role?.toLowerCase().includes("admin") || user?.roles?.includes("admin");
+        if (link.adminOnly && !isAdmin) {
+          return false;
+        }
         if (link.permission && (!user?.permissions || !user.permissions[link.permission])) {
           return false;
         }
@@ -67,6 +26,10 @@ export default function Sidebar({ collapsed }) {
           return {
             ...link,
             subMenu: link.subMenu.filter((sub) => {
+              const isAdmin = user?.role?.toLowerCase().includes("admin") || user?.roles?.includes("admin");
+              if (sub.adminOnly && !isAdmin) {
+                return false;
+              }
               if (sub.permission && (!user?.permissions || !user.permissions[sub.permission])) {
                 return false;
               }
@@ -97,8 +60,8 @@ export default function Sidebar({ collapsed }) {
             collapsed ? "justify-center px-4 py-[20px]" : "px-6 py-[24px]",
           )}
         >
-          <div className="w-9 h-9 rounded-xl bg-linear-to-tr from-blue-600 to-indigo-500 flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-500/20">
-            <Layers size={18} className="text-white" />
+          <div className="w-9 h-9 rounded-xl bg-linear-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/20 text-white font-bold text-sm">
+            S
           </div>
           {!collapsed && (
             <div className="flex flex-col animate-fade-in">
@@ -136,7 +99,6 @@ export default function Sidebar({ collapsed }) {
 }
 
 function NavItem({ item, collapsed }) {
-  const Icon = item.icon;
   const hasSubMenu = item.subMenu && item.subMenu.length > 0;
   const isChildActive =
     hasSubMenu &&
@@ -165,20 +127,10 @@ function NavItem({ item, collapsed }) {
         )}
         title={collapsed ? item.name : ""}
       >
-        <Icon
-          size={20}
-          className={clsx(
-            "shrink-0",
-            active
-              ? "text-blue-400"
-              : "group-hover:scale-110 transition-transform",
-          )}
-        />
-
         {!collapsed && (
           <span
             className={clsx(
-              " text-sm truncate flex-1",
+              " text-sm truncate flex-1 font-medium",
               active ? "text-white" : "",
             )}
           >
@@ -186,17 +138,21 @@ function NavItem({ item, collapsed }) {
           </span>
         )}
 
+        {/* Empty placeholder for collapsed state if needed, or just let text handle it */}
+        {collapsed && (
+          <span className="text-sm font-medium tracking-tight truncate max-w-[40px]">
+            {item.name.substring(0, 3)}
+          </span>
+        )}
+
         {!collapsed && hasSubMenu && (
           <div
             className={clsx(
-              "transition-transform duration-300",
-              isOpen ? "rotate-90" : "",
+              "transition-transform duration-300 ml-auto flex items-center shrink-0",
+              isOpen ? "rotate-180" : "",
             )}
           >
-            <ChevronRight
-              size={14}
-              className={active ? "text-blue-400" : "text-slate-600"}
-            />
+            <ChevronDown size={16} className="text-slate-400 group-hover:text-slate-200 transition-colors" />
           </div>
         )}
 

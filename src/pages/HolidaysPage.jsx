@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import ResourcePage from "../component/common/ResourcePage";
 import { holidaysApi } from "../services/api/holidays";
-import { RotateCcw, Check, X } from "lucide-react";
+
 
 // Highlight matching text within a string
 function Highlight({ text, query }) {
@@ -157,13 +157,9 @@ export default function HolidaysPage() {
         label: "STATUS",
         render: (val) => (
           <div
-            className={`p-1 rounded-lg flex items-center justify-center border transition-colors ${val ? "bg-red-50 border-red-100 text-red-500 dark:bg-red-500/10 dark:border-red-500/20" : "bg-green-50 border-green-100 text-green-500 dark:bg-green-500/10 dark:border-green-500/20"}`}
+            className={`px-2 py-1 text-[10px] text-center rounded-lg border transition-colors ${val ? "bg-red-50 border-red-100 text-red-500 dark:bg-red-500/10 dark:border-red-500/20" : "bg-green-50 border-green-100 text-green-500 dark:bg-green-500/10 dark:border-green-500/20"}`}
           >
-            {val ? (
-              <X size={14} strokeWidth={4} />
-            ) : (
-              <Check size={14} strokeWidth={4} />
-            )}
+            {val ? "Deleted" : "Active"}
           </div>
         ),
       },
@@ -257,13 +253,10 @@ export default function HolidaysPage() {
       {/* Clear Button */}
       <button
         onClick={handleClear}
-        className="p-3 bg-white dark:bg-[#1e2436] border border-slate-200 dark:border-white/10 rounded-xl text-slate-400 hover:text-blue-500 hover:border-blue-500/30 transition-all active:scale-95 group shadow-sm flex items-center justify-center min-w-[46px]"
+        className="px-4 py-3 bg-white dark:bg-[#1e2436] border border-slate-200 dark:border-white/10 rounded-xl text-xs text-slate-400 font-medium hover:text-blue-500 hover:border-blue-500/30 transition-all active:scale-95 shadow-sm min-w-[46px]"
         title="Clear Filters"
       >
-        <RotateCcw
-          size={18}
-          className="group-hover:rotate-180 transition-transform duration-500"
-        />
+        Clear
       </button>
     </div>
   );

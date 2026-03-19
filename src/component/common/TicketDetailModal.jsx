@@ -11,16 +11,7 @@ import {
   Stack,
   Paper,
 } from "@mui/material";
-import {
-  X,
-  Clock,
-  User,
-  Calendar,
-  Hash,
-  Building2,
-  CheckCircle2,
-  Layers,
-} from "lucide-react";
+
 
 function formatDate(val) {
   if (!val) return "—";
@@ -59,24 +50,26 @@ function InfoCard({ icon: IconElement, label, value, mono = false }) {
         className: "dark:bg-white/2 dark:hover:bg-white/5 dark:border-white/5",
       }}
     >
-      <Box
-        sx={{
-          mt: 0.3,
-          p: 0.8,
-          borderRadius: "10px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          flexShrink: 0,
-          background:
-            "linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.1) 100%)",
-          color: "primary.main",
-          border: "1px solid",
-          borderColor: "primary.100",
-        }}
-      >
-        <IconElement size={14} />
-      </Box>
+      {IconElement && (
+        <Box
+          sx={{
+            mt: 0.3,
+            p: 0.8,
+            borderRadius: "10px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            flexShrink: 0,
+            background:
+              "linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.1) 100%)",
+            color: "primary.main",
+            border: "1px solid",
+            borderColor: "primary.100",
+          }}
+        >
+          <IconElement size={14} />
+        </Box>
+      )}
       <Box sx={{ minWidth: 0 }}>
         <Typography
           variant="caption"
@@ -148,19 +141,7 @@ export default function TicketDetailModal({ open, onClose, item, ticket }) {
           >
             <Box sx={{ flex: 1, minWidth: 0 }}>
               <Stack direction="row" alignItems="center" gap={1} sx={{ mb: 1 }}>
-                <Box
-                  sx={{
-                    p: 0.8,
-                    borderRadius: 1.5,
-                    background:
-                      "linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)",
-                    color: "#fff",
-                    display: "flex",
-                    boxShadow: "0 4px 12px rgba(37, 99, 235, 0.2)",
-                  }}
-                >
-                  <Layers size={16} />
-                </Box>
+
                 <Typography
                   variant="caption"
                   sx={{
@@ -233,7 +214,7 @@ export default function TicketDetailModal({ open, onClose, item, ticket }) {
             </Box>
 
             <IconButton onClick={onClose} size="small" sx={{ mt: 0.5 }}>
-              <X size={18} />
+              
             </IconButton>
           </Stack>
         </Box>
@@ -244,22 +225,21 @@ export default function TicketDetailModal({ open, onClose, item, ticket }) {
         <Stack spacing={1.5}>
           <Stack direction="row" gap={1.5}>
             <Box sx={{ flex: 1 }}>
-              <InfoCard icon={Building2} label="Site Name" value={t.siteName} />
+              <InfoCard label="Site Name" value={t.siteName} />
             </Box>
             <Box sx={{ flex: 1 }}>
-              <InfoCard icon={Hash} label="Site OCN" value={t.siteOcn} mono />
+              <InfoCard label="Site OCN" value={t.siteOcn} mono />
             </Box>
           </Stack>
 
-          <InfoCard icon={Hash} label="Ticket Number" value={t.ticketNo} mono />
+          <InfoCard label="Ticket Number" value={t.ticketNo} mono />
 
           <Stack direction="row" gap={1.5}>
             <Box sx={{ flex: 1 }}>
-              <InfoCard icon={User} label="Created By" value={t.createdBy} />
+              <InfoCard label="Created By" value={t.createdBy} />
             </Box>
             <Box sx={{ flex: 1 }}>
               <InfoCard
-                icon={User}
                 label="Closed By"
                 value={t.ticketClosedBy}
               />
@@ -271,14 +251,12 @@ export default function TicketDetailModal({ open, onClose, item, ticket }) {
           <Stack direction="row" gap={1.5}>
             <Box sx={{ flex: 1 }}>
               <InfoCard
-                icon={Calendar}
                 label="Received At"
                 value={formatDate(t.receivedAt)}
               />
             </Box>
             <Box sx={{ flex: 1 }}>
               <InfoCard
-                icon={Clock}
                 label="Total Duration"
                 value={t.totalDuration ? `${t.totalDuration} hrs` : "—"}
               />
@@ -288,14 +266,12 @@ export default function TicketDetailModal({ open, onClose, item, ticket }) {
           <Stack direction="row" gap={1.5}>
             <Box sx={{ flex: 1 }}>
               <InfoCard
-                icon={CheckCircle2}
                 label="CMS Closed On"
                 value={formatDate(t.cmsTicketClosedOn)}
               />
             </Box>
             <Box sx={{ flex: 1 }}>
               <InfoCard
-                icon={Clock}
                 label="Service Closed"
                 value={formatDate(t.serviceClosedDate)}
               />

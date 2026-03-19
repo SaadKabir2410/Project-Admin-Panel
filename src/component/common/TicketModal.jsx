@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X, Loader2, Save, AlertCircle } from "lucide-react";
+
 import { SITES, OCNS, ASSIGNEES, STATUSES } from "../../data/DB";
 
 function Field({ label, error, children }) {
@@ -143,7 +143,7 @@ export default function TicketModal({
             onClick={onClose}
             className="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-white/5 transition-all"
           >
-            <X size={18} />
+            
           </button>
         </div>
 
@@ -302,16 +302,7 @@ export default function TicketModal({
               disabled={loading}
               className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-500 hover:bg-blue-600 disabled:bg-blue-400 text-white text-sm transition-all shadow-lg shadow-blue-500/25"
             >
-              {loading ? (
-                <Loader2 size={15} className="animate-spin" />
-              ) : (
-                <Save size={15} />
-              )}
-              {loading
-                ? "Saving..."
-                : isEdit
-                  ? "Update Ticket"
-                  : "Create Ticket"}
+              {loading ? "Saving..." : isEdit ? "Update Ticket" : "Create Ticket"}
             </button>
           </div>
         </form>

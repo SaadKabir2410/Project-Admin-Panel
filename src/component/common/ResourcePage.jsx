@@ -1,30 +1,11 @@
 import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContextHook";
-import {
-  Search,
-  Plus,
-  MoreVertical,
-  History,
-  Pencil,
-  Trash2,
-  Loader2,
-  X,
-  ChevronLeft,
-  ChevronRight,
-  ChevronsLeft,
-  ChevronsRight,
-  ChevronDown,
-  ChevronUp,
-  ArrowLeft,
-  SlidersHorizontal,
-  Info,
-  Eye,
-} from "lucide-react";
+
 import { DataGrid, getGridStringOperators } from "@mui/x-data-grid";
 import { useResource } from "../hooks/useResource";
 import { useToast } from "./ToastContext";
-
+import { ArrowLeft, ChevronDown } from "lucide-react";
 import { Menu, MenuItem, ListItemIcon, ListItemText, Box } from "@mui/material";
 
 function ActionsMenu({
@@ -33,6 +14,9 @@ function ActionsMenu({
   onDetail,
   onPermissions,
   onDelete,
+  onDisable,
+  onEnable,
+  deleteButtonText = "Delete",
 }) {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -48,9 +32,9 @@ function ActionsMenu({
     <div>
       <button
         onClick={handleClick}
-        className="p-2 hover:bg-slate-100 dark:hover:bg-white/5 rounded-lg transition-colors text-slate-400"
+        className="h-[30px] w-fit px-3 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-medium rounded-lg transition-all inline-flex items-center justify-center gap-1 shadow-sm"
       >
-        <MoreVertical size={16} />
+        Actions <ChevronDown size={12} strokeWidth={2.5} />
       </button>
       <Menu
         anchorEl={anchorEl}
@@ -63,7 +47,7 @@ function ActionsMenu({
             mt: 1,
             borderRadius: "12px",
             boxShadow:
-              "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)",
+              "0 4px 6px -2px rgba(0, 0, 0, 0.05), 0 10px 15px -3px rgba(0, 0, 0, 0.1)",
             border: "1px solid",
             borderColor: "divider",
             minWidth: 160,
@@ -71,78 +55,38 @@ function ActionsMenu({
         }}
       >
         {onDetail && (
-          <MenuItem
-            onClick={() => {
-              onDetail();
-              handleClose();
-            }}
-            sx={{ py: 0.75, minHeight: "32px" }}
-          >
-
-            <ListItemText
-              primary="View Details"
-              primaryTypographyProps={{ fontSize: "12px", fontWeight: 600 }}
-            />
+          <MenuItem onClick={() => { onDetail(); handleClose(); }} sx={{ py: 1 }}>
+            <ListItemText primary="View Details" primaryTypographyProps={{ fontSize: "12px", fontWeight: 600 }} />
           </MenuItem>
         )}
         {onAuditLog && (
-          <MenuItem
-            onClick={() => {
-              onAuditLog();
-              handleClose();
-            }}
-            sx={{ py: 0.75, minHeight: "32px" }}
-          >
-
-            <ListItemText
-              primary="Audit Log"
-              primaryTypographyProps={{ fontSize: "12px", fontWeight: 600 }}
-            />
+          <MenuItem onClick={() => { onAuditLog(); handleClose(); }} sx={{ py: 1 }}>
+            <ListItemText primary="Audit Log" primaryTypographyProps={{ fontSize: "12px", fontWeight: 600 }} />
           </MenuItem>
         )}
         {onPermissions && (
-          <MenuItem
-            onClick={() => {
-              onPermissions();
-              handleClose();
-            }}
-            sx={{ py: 0.75, minHeight: "32px" }}
-          >
-
-            <ListItemText
-              primary="Permissions"
-              primaryTypographyProps={{ fontSize: "12px", fontWeight: 600 }}
-            />
+          <MenuItem onClick={() => { onPermissions(); handleClose(); }} sx={{ py: 1 }}>
+            <ListItemText primary="Permissions" primaryTypographyProps={{ fontSize: "12px", fontWeight: 600 }} />
           </MenuItem>
         )}
         {onEdit && (
-          <MenuItem
-            onClick={() => {
-              onEdit();
-              handleClose();
-            }}
-            sx={{ py: 0.75, minHeight: "32px" }}
-          >
-
-            <ListItemText
-              primary="Update Data"
-              primaryTypographyProps={{ fontSize: "12px", fontWeight: 600 }}
-            />
+          <MenuItem onClick={() => { onEdit(); handleClose(); }} sx={{ py: 1 }}>
+            <ListItemText primary="Update Data" primaryTypographyProps={{ fontSize: "12px", fontWeight: 600 }} />
+          </MenuItem>
+        )}
+        {onDisable && (
+          <MenuItem onClick={() => { onDisable(); handleClose(); }} sx={{ py: 1 }}>
+            <ListItemText primary="Disable" primaryTypographyProps={{ fontSize: "12px", fontWeight: 600, color: "warning.main" }} />
+          </MenuItem>
+        )}
+        {onEnable && (
+          <MenuItem onClick={() => { onEnable(); handleClose(); }} sx={{ py: 1 }}>
+            <ListItemText primary="Enable" primaryTypographyProps={{ fontSize: "12px", fontWeight: 600, color: "success.main" }} />
           </MenuItem>
         )}
         {onDelete && (
-          <MenuItem
-            onClick={() => {
-              onDelete();
-              handleClose();
-            }}
-            sx={{ py: 0.75, minHeight: "32px" }}
-          >
-
-            <ListItemText
-              primary="Delete Record"
-              primaryTypographyProps={{ fontSize: "12px", fontWeight: 600 }}
-            />
+          <MenuItem onClick={() => { onDelete(); handleClose(); }} sx={{ py: 1 }}>
+            <ListItemText primary={deleteButtonText} primaryTypographyProps={{ fontSize: "12px", fontWeight: 600, color: "error.main" }} />
           </MenuItem>
         )}
       </Menu>
@@ -178,7 +122,14 @@ export default function ResourcePage({
   onPermissions = null,
   showAuditLog = true,
   onDelete = null,
+  deleteButtonText = "Delete",
   onDeleteVisibilityCheck = null,
+  onDisable = null,
+  onDisableVisibilityCheck = null,
+  onEnable = null,
+  onEnableVisibilityCheck = null,
+  onEditVisibilityCheck = null,
+  hideActionsCheck = null,
 }) {
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -481,48 +432,62 @@ export default function ResourcePage({
     if (showActions) {
       cols.unshift({
         field: "actions",
-        headerName: "ACTIONS",
+        headerName: "",
         width: 100,
         sortable: false,
         filterable: false,
-        renderCell: (params) => (
-          <ActionsMenu
-            onDetail={
-              apiObject.id === "auditLogs"
-                ? () => {
-                  setActiveItem(params.row);
-                  if (detailViewMode === "side") setSidePanelOpen(true);
-                  else setModals((m) => ({ ...m, detail: true }));
-                }
-                : null
-            }
-            onAuditLog={
-              showAuditLog && apiObject.id !== "auditLogs"
-                ? () =>
-                  navigate(
-                    `/audit-logs?primaryKey=${params.row.id}&entityName=${entityName || title.slice(0, -1)}`,
-                  )
-                : null
-            }
-            onEdit={
-              ModalComponent
-                ? () => {
-                  setActiveItem(params.row);
-                  setModals((m) => ({ ...m, edit: true }));
-                }
-                : null
-            }
-            onPermissions={
-              onPermissions ? () => onPermissions(params.row) : null
-            }
-            onDelete={
-              onDelete &&
-                (!onDeleteVisibilityCheck || onDeleteVisibilityCheck(params.row))
-                ? () => onDelete(params.row)
-                : null
-            }
-          />
-        ),
+        renderCell: (params) => {
+          if (hideActionsCheck && hideActionsCheck(params.row)) return null;
+          return (
+            <ActionsMenu
+              onDetail={
+                apiObject.id === "auditLogs"
+                  ? () => {
+                    setActiveItem(params.row);
+                    if (detailViewMode === "side") setSidePanelOpen(true);
+                    else setModals((m) => ({ ...m, detail: true }));
+                  }
+                  : null
+              }
+              onAuditLog={
+                showAuditLog && apiObject.id !== "auditLogs"
+                  ? () =>
+                    navigate(
+                      `/audit-logs?primaryKey=${params.row.id}&entityName=${entityName || title.slice(0, -1)}`,
+                    )
+                  : null
+              }
+              onEdit={
+                ModalComponent && (!onEditVisibilityCheck || onEditVisibilityCheck(params.row))
+                  ? () => {
+                    setActiveItem(params.row);
+                    setModals((m) => ({ ...m, edit: true }));
+                  }
+                  : null
+              }
+              onPermissions={
+                onPermissions ? () => onPermissions(params.row) : null
+              }
+              onDisable={
+                onDisable && (!onDisableVisibilityCheck || onDisableVisibilityCheck(params.row))
+                  ? () => onDisable(params.row)
+                  : null
+              }
+              onEnable={
+                onEnable && (!onEnableVisibilityCheck || onEnableVisibilityCheck(params.row))
+                  ? () => onEnable(params.row)
+                  : null
+              }
+              onDelete={
+                onDelete &&
+                  (!onDeleteVisibilityCheck || onDeleteVisibilityCheck(params.row))
+                  ? () => onDelete(params.row)
+                  : null
+              }
+              deleteButtonText={deleteButtonText}
+            />
+          );
+        },
       });
     }
 
@@ -569,8 +534,9 @@ export default function ResourcePage({
               <button
                 onClick={() => navigate(-1)}
                 className="p-2 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-slate-400 hover:text-blue-500 hover:border-blue-500/30 transition-all active:scale-95 shadow-sm"
+                title="Go Back"
               >
-                <ArrowLeft size={18} />
+                <ArrowLeft size={16} strokeWidth={2.5} />
               </button>
               <div>
                 <h1 className="text-2xl text-slate-800 dark:text-white leading-none">
@@ -589,7 +555,7 @@ export default function ResourcePage({
                       : "flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-xl shadow-lg shadow-blue-100 dark:shadow-none transition-all active:scale-95"
                   }
                 >
-                  {!smallHeaderButton && <Plus size={16} />}
+
                   {createButtonText}
                 </button>
               )}
@@ -603,10 +569,7 @@ export default function ResourcePage({
             <div className="flex items-center gap-6 flex-1 min-w-[300px]">
               {showSearchBar && (
                 <div className="relative w-full max-w-[280px] group">
-                  <Search
-                    size={16}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors"
-                  />
+
                   <input
                     type="text"
                     placeholder={searchPlaceholder}
@@ -627,7 +590,7 @@ export default function ResourcePage({
           <div className="flex-1 flex flex-col min-w-0">
             {error && (
               <div className="m-8 p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3 text-red-600 animate-in fade-in slide-in-from-top-4">
-                <X className="shrink-0" size={20} />
+
                 <div className="flex-1">
                   <p className="text-sm ">Failed to load data</p>
                   <p className="text-xs opacity-80 ">
@@ -689,7 +652,7 @@ export default function ResourcePage({
                   noRowsOverlay: () => (
                     <div className="h-full flex flex-col items-center justify-center p-10 space-y-4">
                       <div className="w-16 h-16 bg-slate-50 dark:bg-white/5 rounded-3xl flex items-center justify-center text-slate-300 dark:text-slate-600 border border-slate-100 dark:border-white/5">
-                        <Search size={32} strokeWidth={1.5} />
+
                       </div>
                       <div className="text-center">
                         <p className="text-sm text-slate-800 dark:text-white tracking-tighter">
@@ -742,7 +705,7 @@ export default function ResourcePage({
                     disabled={page === 1 || loading}
                     className="p-1.5 rounded-lg border border-slate-200 dark:border-white/10 disabled:opacity-30 hover:bg-white dark:hover:bg-white/5 transition-all shadow-sm flex items-center justify-center bg-white"
                   >
-                    <ChevronsLeft size={16} />
+
                   </button>
                   <button
                     onClick={handlePrevPage}
@@ -766,7 +729,7 @@ export default function ResourcePage({
                     disabled={page >= displayTotalPages || loading}
                     className="p-1.5 rounded-lg border border-slate-200 dark:border-white/10 disabled:opacity-30 hover:bg-white dark:hover:bg-white/5 transition-all shadow-sm flex items-center justify-center bg-white"
                   >
-                    <ChevronsRight size={16} />
+
                   </button>
                 </div>
               </div>
@@ -789,7 +752,7 @@ export default function ResourcePage({
                   onClick={() => setSidePanelOpen(false)}
                   className="p-2 hover:bg-red-50 hover:text-red-500 transition-all rounded-xl border border-transparent hover:border-red-100"
                 >
-                  <X size={20} />
+
                 </button>
               </div>
               <div className="flex-1 overflow-y-auto">

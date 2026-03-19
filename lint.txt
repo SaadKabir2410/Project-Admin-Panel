@@ -1,0 +1,105 @@
+﻿
+> package@0.0.0 lint
+> eslint .
+
+
+G:\KABIR\React\Admin-Panel-Dashboard\Admin-Dashboard\src\App.jsx
+  2:10  error  'useAuth' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+G:\KABIR\React\Admin-Panel-Dashboard\Admin-Dashboard\src\component\common\CollapsibleAuditLogTable.jsx
+  63:22  error  Parsing error: Unexpected token :
+
+G:\KABIR\React\Admin-Panel-Dashboard\Admin-Dashboard\src\component\common\CountryModal.jsx
+  180:11  error  Parsing error: Unexpected token )
+
+G:\KABIR\React\Admin-Panel-Dashboard\Admin-Dashboard\src\component\common\HolidayModal.jsx
+  401:13  error  Parsing error: Unexpected token )
+
+G:\KABIR\React\Admin-Panel-Dashboard\Admin-Dashboard\src\component\common\ResourcePage.jsx
+  480:42  error  Parsing error: Unexpected token }
+
+G:\KABIR\React\Admin-Panel-Dashboard\Admin-Dashboard\src\component\common\SiteModal.jsx
+  310:14  error  Parsing error: Unexpected token `}`. Did you mean `&rbrace;` or `{"}"}`?
+
+G:\KABIR\React\Admin-Panel-Dashboard\Admin-Dashboard\src\component\common\TicketDetailModal.jsx
+   31:27  error  'IconElement' is defined but never used  no-unused-vars
+  238:31  error  'Building2' is not defined               no-undef
+  241:31  error  'Hash' is not defined                    no-undef
+  245:27  error  'Hash' is not defined                    no-undef
+  249:31  error  'User' is not defined                    no-undef
+  253:23  error  'User' is not defined                    no-undef
+  265:23  error  'Calendar' is not defined                no-undef
+  272:23  error  'Clock' is not defined                   no-undef
+  282:23  error  'CheckCircle2' is not defined            no-undef
+  289:23  error  'Clock' is not defined                   no-undef
+
+G:\KABIR\React\Admin-Panel-Dashboard\Admin-Dashboard\src\component\common\TicketModal.jsx
+  307:15  error  Parsing error: Unexpected token )
+
+G:\KABIR\React\Admin-Panel-Dashboard\Admin-Dashboard\src\component\common\WorkCodeModal.jsx
+  192:16  error  Parsing error: Unexpected token `}`. Did you mean `&rbrace;` or `{"}"}`?
+
+G:\KABIR\React\Admin-Panel-Dashboard\Admin-Dashboard\src\component\hooks\useResource.js
+  74:6  warning  React Hook useCallback has a missing dependency: 'params'. Either include it or remove the dependency array                                 react-hooks/exhaustive-deps
+  74:7  warning  React Hook useCallback has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked  react-hooks/exhaustive-deps
+
+G:\KABIR\React\Admin-Panel-Dashboard\Admin-Dashboard\src\component\hooks\useTickets.js
+  31:6  warning  React Hook useCallback has missing dependencies: 'auth' and 'params'. Either include them or remove the dependency array                    react-hooks/exhaustive-deps
+  31:7  warning  React Hook useCallback has a complex expression in the dependency array. Extract it to a separate variable so it can be statically checked  react-hooks/exhaustive-deps
+  62:6  warning  React Hook useCallback has a missing dependency: 'auth'. Either include it or remove the dependency array                                   react-hooks/exhaustive-deps
+
+G:\KABIR\React\Admin-Panel-Dashboard\Admin-Dashboard\src\context\Authcontext.jsx
+  10:14  error  Fast refresh only works when a file only exports components. Move your React context(s) to a separate file                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          react-refresh/only-export-components
+  66:7   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  64 |     if (!isManualAuth && user) {
+  65 |       // No authentication at all, clear internal state
+> 66 |       setUser(null);
+     |       ^^^^^^^ Avoid calling setState() directly within an effect
+  67 |       localStorage.removeItem(SESSION_KEY);
+  68 |     }
+  69 |   }, [user]);  react-hooks/set-state-in-effect
+
+G:\KABIR\React\Admin-Panel-Dashboard\Admin-Dashboard\src\context\ThemeContext.jsx
+  23:17  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+G:\KABIR\React\Admin-Panel-Dashboard\Admin-Dashboard\src\pages\AMSTicketsPage.jsx
+  67:19  error  Parsing error: Unexpected token }
+
+G:\KABIR\React\Admin-Panel-Dashboard\Admin-Dashboard\src\pages\AMSTicketsReportPage.jsx
+  465:17  error  Parsing error: Unexpected token )
+
+G:\KABIR\React\Admin-Panel-Dashboard\Admin-Dashboard\src\pages\Auth\Login.jsx
+  53:48  error  Parsing error: Unexpected token }
+
+G:\KABIR\React\Admin-Panel-Dashboard\Admin-Dashboard\src\pages\Dashboard.jsx
+  115:9   error  'StatIcon' is defined but never used  no-unused-vars
+  194:13  error  'Ticket' is not defined               no-undef
+  211:13  error  'Clock' is not defined                no-undef
+  228:13  error  'CheckCircle' is not defined          no-undef
+  245:13  error  'Users' is not defined                no-undef
+
+G:\KABIR\React\Admin-Panel-Dashboard\Admin-Dashboard\src\pages\GeneralReportPage.jsx
+  153:17  error  Parsing error: Unexpected token )
+
+G:\KABIR\React\Admin-Panel-Dashboard\Admin-Dashboard\src\pages\HolidaysPage.jsx
+  164:13  error  Parsing error: Unexpected token )
+
+G:\KABIR\React\Admin-Panel-Dashboard\Admin-Dashboard\src\pages\JobsheetsPage.jsx
+  368:9  error  Parsing error: Unexpected token )
+
+G:\KABIR\React\Admin-Panel-Dashboard\Admin-Dashboard\src\pages\UsersPage.jsx
+  455:26  error  Parsing error: Unexpected token `}`. Did you mean `&rbrace;` or `{"}"}`?
+
+G:\KABIR\React\Admin-Panel-Dashboard\Admin-Dashboard\src\services\api\users.js
+  10:5  error  'columnFilter' is assigned a value but never used    no-unused-vars
+  11:5  error  'filterOperator' is assigned a value but never used  no-unused-vars
+
+Γ£û 40 problems (35 errors, 5 warnings)
+

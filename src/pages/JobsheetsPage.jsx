@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import ResourcePage from "../component/common/ResourcePage";
 import { jobsheetsApi } from "../services/api/jobsheets";
 import { usersApi } from "../services/api/users";
-import { Download, RotateCcw, Loader2, X, AlertTriangle } from "lucide-react";
+
 import { useJobsheetReport } from "../component/hooks/useJobsheetReport";
 
 const PROJECTS = [
@@ -281,7 +281,7 @@ export default function JobsheetsPage() {
             />
             {isSearchingCollaborators && (
               <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                <Loader2 size={14} className="animate-spin text-blue-500" />
+                
               </div>
             )}
           </div>
@@ -323,13 +323,10 @@ export default function JobsheetsPage() {
       {/* Clear Button */}
       <button
         onClick={handleClear}
-        className="p-2.5 mt-auto bg-white dark:bg-[#1e2436] border border-slate-200 dark:border-white/10 rounded-xl text-slate-400 hover:text-blue-500 hover:border-blue-500/30 transition-all active:scale-95 group shadow-sm flex items-center justify-center h-[38px] w-[42px]"
+        className="px-4 mt-auto bg-white dark:bg-[#1e2436] border border-slate-200 dark:border-white/10 rounded-xl text-slate-400 hover:text-blue-500 hover:border-blue-500/30 transition-all active:scale-95 text-xs font-medium shadow-sm flex items-center justify-center h-[38px] min-w-[50px]"
         title="Clear Filters"
       >
-        <RotateCcw
-          size={16}
-          className="group-hover:rotate-180 transition-transform duration-500"
-        />
+        Clear
       </button>
     </div>
   );
@@ -353,7 +350,7 @@ export default function JobsheetsPage() {
             onClick={clearReportError}
             className="ml-2 text-red-700 hover:text-red-900"
           >
-            <X size={14} />
+            
           </button>
         </div>
       )}
@@ -363,11 +360,6 @@ export default function JobsheetsPage() {
         onClick={() => fetchReport(filters, true)}
         disabled={reportLoading}
       >
-        {reportLoading ? (
-          <Loader2 size={16} className="animate-spin mr-2" />
-        ) : (
-          <Download size={16} className="mr-2" />
-        )}
         {reportLoading ? "Generating..." : "Get Report"}
       </button>
     </div>
@@ -414,7 +406,7 @@ export default function JobsheetsPage() {
                 onClick={clearReportData}
                 className="p-2 text-slate-400 hover:text-red-500 hover:bg-slate-100 dark:hover:bg-white/5 rounded-xl transition-all"
               >
-                <X size={20} />
+                
               </button>
             </div>
 

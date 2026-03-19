@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Dialog, IconButton } from "@mui/material";
-import { X, Loader2, Check, AlertCircle } from "lucide-react";
+
 import { workCodesApi } from "../../services/api/workCodes";
 
 const EMPTY = { description: "", code: "" };
@@ -156,7 +156,7 @@ export default function WorkCodeModal({
           {isEdit ? "Update Work Code" : "Create Work Code"}
         </h2>
         <IconButton onClick={onClose} size="small">
-          <X size={20} />
+          
         </IconButton>
       </div>
 
@@ -187,9 +187,7 @@ export default function WorkCodeModal({
               )}
             />
             <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center">
-              {checkingCode && (
-                <Loader2 size={16} className="animate-spin text-blue-500" />
-              )}
+              {checkingCode && "Checking..."}
               {errors.code && (
                 <AlertCircle size={16} className="text-red-500" />
               )}
@@ -249,9 +247,7 @@ export default function WorkCodeModal({
           disabled={loading || checkingCode || !!errors.code}
           className="px-8 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm flex items-center justify-center min-w-[120px] disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-blue-100 dark:shadow-none transition-all"
         >
-          {loading ? (
-            <Loader2 size={18} className="animate-spin" />
-          ) : isEdit ? (
+          {loading ? "Loading..." : isEdit ? (
             "Update"
           ) : (
             "Create"

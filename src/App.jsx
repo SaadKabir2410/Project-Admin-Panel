@@ -11,6 +11,7 @@ import SitesPage from "./pages/SitesPage";
 import CountriesPage from "./pages/CountriesPage";
 import AuditLogsPage from "./pages/AuditLogsPage";
 import WorkCodesPage from "./pages/WorkCodesPage";
+import CodePage from "./pages/CodePage";
 import HolidaysPage from "./pages/HolidaysPage";
 import UserWorkingHoursPage from "./pages/UserWorkingHoursPage";
 import JobsheetsPage from "./pages/JobsheetsPage";
@@ -20,6 +21,7 @@ import GeneralReportPage from "./pages/GeneralReportPage";
 import AfterWorkingHoursReportPage from "./pages/AfterWorkingHoursReportPage";
 import UsersPage from "./pages/UsersPage";
 import RolesPage from "./pages/RolesPage";
+import TaskCategoryProjectsPage from "./pages/TaskCategoryProjectsPage";
 
 function Layout({ collapsed, setCollapsed }) {
   return (
@@ -34,6 +36,7 @@ function Layout({ collapsed, setCollapsed }) {
             <Route path="/sites" element={<SitesPage />} />
             <Route path="/countries" element={<CountriesPage />} />
             <Route path="/work-codes" element={<WorkCodesPage />} />
+            <Route path="/codes" element={<CodePage />} />
             <Route path="/holidays" element={<HolidaysPage />} />
             <Route path="/working-hours" element={<UserWorkingHoursPage />} />
             <Route path="/jobsheets" element={<JobsheetsPage />} />
@@ -49,6 +52,7 @@ function Layout({ collapsed, setCollapsed }) {
             <Route path="/reports/general" element={<GeneralReportPage />} />
             <Route path="/users" element={<UsersPage />} />
             <Route path="/roles" element={<RolesPage />} />
+            <Route path="/task-category-projects" element={<TaskCategoryProjectsPage />} />
 
             <Route path="/audit-logs" element={<AuditLogsPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />

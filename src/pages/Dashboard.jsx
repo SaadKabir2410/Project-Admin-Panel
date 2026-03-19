@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { Home, ArrowUpRight, ArrowDownRight } from "lucide-react";
 
-import { Home } from "lucide-react";
+
 import {
   AreaChart,
   Area,
@@ -18,14 +19,7 @@ import {
   BarChart,
   Bar,
 } from "recharts";
-import {
-  Ticket,
-  Users,
-  CheckCircle,
-  Clock,
-  ArrowUpRight,
-  ArrowDownRight,
-} from "lucide-react";
+
 
 const ticketTrend = [
   { day: "Mon", open: 42, closed: 28 },
@@ -119,7 +113,6 @@ const CustomTooltip = ({ active, payload, label }) => {
 };
 
 function StatCard({
-  icon: StatIcon,
   label,
   value,
   change,
@@ -131,18 +124,12 @@ function StatCard({
     <div className="bg-white dark:bg-[#1e2436] rounded-2xl border border-slate-200 dark:border-white/10 p-5 hover:shadow-lg hover:shadow-slate-100/80 dark:hover:shadow-black/20 transition-all duration-200 flex flex-col justify-between">
       <div>
         <div className="flex items-start justify-between mb-4">
-          <div
-            className="w-11 h-11 rounded-xl flex items-center justify-center"
-            style={{ background: color + "18" }}
-          >
-            <StatIcon size={20} style={{ color }} />
-          </div>
+
           <span
-            className={`flex items-center gap-0.5 text-xs px-2 py-1 rounded-full ${
-              positive
+            className={`flex items-center gap-0.5 text-xs px-2 py-1 rounded-full ${positive
                 ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-400"
                 : "bg-red-50 text-red-500 dark:bg-red-500/15 dark:text-red-400"
-            }`}
+              }`}
           >
             {positive ? (
               <ArrowUpRight size={12} />
@@ -198,7 +185,7 @@ export default function Dashboard() {
 
   const stats = [
     {
-      icon: Ticket,
+
       label: "Total Tickets",
       value: "1,718",
       change: "12.5%",
@@ -215,7 +202,7 @@ export default function Dashboard() {
       ],
     },
     {
-      icon: Clock,
+
       label: "Open Tickets",
       value: "1,024",
       change: "8.2%",
@@ -232,7 +219,7 @@ export default function Dashboard() {
       ],
     },
     {
-      icon: CheckCircle,
+
       label: "Closed Tickets",
       value: "694",
       change: "18.7%",
@@ -249,7 +236,7 @@ export default function Dashboard() {
       ],
     },
     {
-      icon: Users,
+
       label: "Active Customers",
       value: "248",
       change: "4.1%",

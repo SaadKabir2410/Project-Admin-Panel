@@ -3,15 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContextHook";
 
 import Logo from "../../assets/Sureze_Logo.png";
-import {
-  Eye,
-  EyeOff,
-  User,
-  Lock,
-  AlertCircle,
-  ArrowRight,
-  Loader2,
-} from "lucide-react";
+
 
 function InputField({
   label,
@@ -58,7 +50,7 @@ function InputField({
             onClick={() => setShowPass((s) => !s)}
             className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
           >
-            {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
+            {showPass ? "Hide" : "Show"}
           </button>
         )}
       </div>
@@ -268,7 +260,6 @@ export default function LoginPage() {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Enter your username"
-              icon={User}
             />
             <InputField
               id="password"
@@ -277,7 +268,6 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
-              icon={Lock}
             />
 
             <button
@@ -287,11 +277,11 @@ export default function LoginPage() {
             >
               {isLoggingIn ? (
                 <>
-                  <Loader2 size={17} className="animate-spin" /> Verifying...
+                   Verifying...
                 </>
               ) : (
                 <>
-                  Sign In <ArrowRight size={16} />
+                  Sign In
                 </>
               )}
             </button>

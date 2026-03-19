@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, RotateCcw, FileText } from "lucide-react";
-import { Loader2 } from "lucide-react";
+import { RotateCcw, FileText, ArrowLeft } from "lucide-react";
 import apiClient from "../services/apiClient";
 
 export default function GeneralReportPage() {
@@ -125,7 +124,7 @@ export default function GeneralReportPage() {
                 onClick={() => navigate(-1)}
                 className="p-2 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl text-slate-400 hover:text-blue-500 hover:border-blue-500/30 transition-all active:scale-95 "
               >
-                <ArrowLeft size={18} />
+                <ArrowLeft size={16} strokeWidth={2.5} />
               </button>
               <div>
                 <h1 className="text-2xl text-slate-800 dark:text-white leading-none">
@@ -148,11 +147,6 @@ export default function GeneralReportPage() {
                 disabled={loading}
                 className="flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white rounded-lg text-[11px] transition-all active:scale-95 focus:outline-none"
               >
-                {loading ? (
-                  <Loader2 size={14} className="animate-spin" />
-                ) : (
-                  <FileText size={14} />
-                )}
                 {loading ? "Loading..." : "Get Report"}
               </button>
             </div>

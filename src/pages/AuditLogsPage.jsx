@@ -1,12 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import {
-  Search,
-  Calendar,
-  SlidersHorizontal,
-  ArrowLeft,
-  History,
-} from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { auditLogsApi } from "../services/api/auditLogs";
 import CollapsibleAuditLogTable from "../component/common/CollapsibleAuditLogTable";
 import { useResource } from "../component/hooks/useResource";
@@ -123,10 +117,7 @@ export default function AuditLogsPage() {
   const customFilterArea = (
     <div className="flex items-center gap-4 flex-wrap">
       <div className="relative min-w-[150px]">
-        <SlidersHorizontal
-          size={14}
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-        />
+        
         <select
           value={operationType}
           onChange={(e) => {
@@ -142,10 +133,7 @@ export default function AuditLogsPage() {
       </div>
 
       <div className="relative min-w-[180px]">
-        <Search
-          size={14}
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-        />
+        
         <input
           type="text"
           placeholder="USERNAME..."
@@ -160,10 +148,7 @@ export default function AuditLogsPage() {
 
       <div className="flex items-center gap-2">
         <div className="relative min-w-[160px]">
-          <Calendar
-            size={14}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"
-          />
+          
           <select
             value={datePreset}
             onChange={(e) => {
@@ -219,7 +204,7 @@ export default function AuditLogsPage() {
                 onClick={() => navigate(-1)}
                 className="p-3 bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-2xl text-slate-400 hover:text-blue-500 hover:border-blue-500/30 transition-all active:scale-95 shadow-sm"
               >
-                <ArrowLeft size={22} />
+                <ArrowLeft size={18} />
               </button>
               <div>
                 <div className="flex items-center gap-2 mb-1">
@@ -245,7 +230,7 @@ export default function AuditLogsPage() {
               </div>
             </div>
             <div className="w-12 h-12 bg-blue-50 dark:bg-blue-500/10 text-blue-500 rounded-2xl flex items-center justify-center border border-blue-100 dark:border-blue-500/20 shadow-inner">
-              <History size={24} />
+              
             </div>
           </div>
 

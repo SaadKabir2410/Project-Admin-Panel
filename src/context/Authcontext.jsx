@@ -122,11 +122,11 @@ export function AuthProvider({ children }) {
       const session = await loginWithPassword(email, password);
 
       let userId = email; 
-      let actualRoles = ["admin"];
+      let actualRoles = [];
       let actualName = email.split("@")[0];
       let actualEmail = email;
 
-      // Extract User ID (sub) from JWT
+      // Extract User ID (sub) and Roles from JWT
       if (session && session.access_token) {
         try {
           let base64Url = session.access_token.split(".")[1];
@@ -138,6 +138,9 @@ export function AuthProvider({ children }) {
           const payload = JSON.parse(jsonPayload);
           if (payload.sub) {
             userId = payload.sub;
+          }
+          if (payload.role) {
+            actualRoles = Array.isArray(payload.role) ? payload.role : [payload.role];
           }
         } catch (e) {
           console.warn("Could not decode JWT", e);

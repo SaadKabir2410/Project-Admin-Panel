@@ -1,20 +1,7 @@
 import { useState } from "react";
 import { useTheme } from "../../context/ThemeContext";
 import { useAuth } from "../../context/AuthContextHook";
-import {
-  Bell,
-  ChevronDown,
-  ChevronRight,
-  Globe,
-  Home,
-  LayoutGrid,
-  Menu,
-  Moon,
-  Search,
-  Sun,
-  X,
-  LogOut,
-} from "lucide-react";
+
 
 function IconBtn({
   children,
@@ -48,9 +35,9 @@ export default function Navbar({ setCollapsed }) {
         <IconBtn
           onClick={() => setCollapsed((c) => !c)}
           title="toggle sidebar"
-          className="hover:bg-slate-100 dark:hover:bg-slate-800"
+          className="hover:bg-slate-100 dark:hover:bg-slate-800 px-3"
         >
-          <Menu size={20} />
+          <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Menu</span>
         </IconBtn>
 
         {/* ... rest of left side ... */}
@@ -61,20 +48,19 @@ export default function Navbar({ setCollapsed }) {
         <IconBtn
           onClick={() => setDark(dark === "light" ? "dark" : "light")}
           title="toggle theme"
+          className="px-3"
         >
-          {dark === "dark" ? (
-            <Sun size={20} className="text-amber-400" />
-          ) : (
-            <Moon size={18} className="text-slate-600" />
-          )}
+          <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">
+            {dark === "dark" ? "Light" : "Dark"} Mode
+          </span>
         </IconBtn>
 
-        <IconBtn title="Language" className="hidden sm:flex">
-          <Globe size={19} className="text-slate-600 dark:text-slate-400" />
+        <IconBtn title="Language" className="hidden sm:flex px-3">
+          <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">EN</span>
         </IconBtn>
 
-        <IconBtn badge title="Notifications">
-          <Bell size={19} className="text-slate-600 dark:text-slate-400" />
+        <IconBtn badge title="Notifications" className="px-3">
+          <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">Alerts</span>
         </IconBtn>
 
         <div className="w-px h-6 bg-slate-200 dark:bg-white/10 mx-2" />
@@ -92,13 +78,9 @@ export default function Navbar({ setCollapsed }) {
                 {user?.name || "Saad Kabir"}
               </p>
               <p className="text-[10px] text-slate-500 capitalize">
-                {user?.role || "System Admin"}
+                {user?.role || "User"}
               </p>
             </div>
-            <ChevronDown
-              size={14}
-              className={`text-slate-400 transition-transform ${showMenu ? "rotate-180" : ""}`}
-            />
           </button>
 
           {showMenu && (
@@ -110,10 +92,9 @@ export default function Navbar({ setCollapsed }) {
               </div>
               <button
                 onClick={logout}
-                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                className="w-full text-center px-4 py-2 text-sm text-red-500 font-semibold hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
               >
-                <LogOut size={16} />
-                <span>Logout</span>
+                Logout
               </button>
             </div>
           )}

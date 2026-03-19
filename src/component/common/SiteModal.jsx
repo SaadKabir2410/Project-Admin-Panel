@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Dialog, IconButton, Autocomplete, TextField } from "@mui/material";
-import { X, Loader2, Check, AlertCircle } from "lucide-react";
+
 import { sitesApi } from "../../services/api/sites";
 import { countriesApi } from "../../services/api/countries";
 
@@ -260,7 +260,7 @@ export default function SiteModal({
           size="small"
           className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
         >
-          <X size={20} />
+          
         </IconButton>
       </div>
 
@@ -305,12 +305,7 @@ export default function SiteModal({
               )}
             />
             {/* Spinner while checking */}
-            {ocnChecking && (
-              <Loader2
-                size={15}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-blue-400 animate-spin"
-              />
-            )}
+            {ocnChecking && "..."}
             {/* Green tick when valid and not checking */}
             {form.oCN.length > 0 && !errors.oCN && !ocnChecking && (
               <Check
@@ -437,9 +432,7 @@ export default function SiteModal({
           disabled={loading || ocnChecking}
           className="px-8 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm flex items-center justify-center min-w-[120px] disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-blue-100 dark:shadow-none transition-all"
         >
-          {loading || ocnChecking ? (
-            <Loader2 size={18} className="animate-spin" />
-          ) : isEdit ? (
+          {loading || ocnChecking ? "Wait..." : isEdit ? (
             "Update"
           ) : (
             "Create"
