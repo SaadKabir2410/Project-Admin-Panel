@@ -5,6 +5,7 @@ import {
   getAuthState,
 } from "../services/tokenAuth";
 import { usersApi } from "../services/api/users";
+import apiClient from "../services/apiClient";
 
 export const AuthContext = createContext();
 
@@ -143,8 +144,15 @@ export function AuthProvider({ children }) {
         }
       }
 
-      // Fetch actual user details and roles from API
+      // Fetch actual user details, roles, and permissions from API
+      let permissionsMap = {};
       try {
+        // Fetch ABP config to get grantedPolicies
+        const appConfig = await apiClient.get("/api/abp/application-configuration").then(r => r.data);
+        if (appConfig?.auth?.grantedPolicies) {
+          permissionsMap = appConfig.auth.grantedPolicies;
+        }
+
         const userDetails = await usersApi.getById(userId);
         if (userDetails) {
            actualName = userDetails.name + (userDetails.surname ? " " + userDetails.surname : "");
@@ -168,6 +176,7 @@ export function AuthProvider({ children }) {
         email: actualEmail,
         role: actualRoles.join(", "),
         avatar: actualName.charAt(0).toUpperCase(),
+        permissions: permissionsMap,
       };
 
       localStorage.setItem(SESSION_KEY, JSON.stringify(userProfile));

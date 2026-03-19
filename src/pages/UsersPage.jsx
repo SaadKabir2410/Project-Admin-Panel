@@ -1,5 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import ResourcePage from "../component/common/ResourcePage";
+import { useToast } from "../component/common/ToastContext";
+import CircularProgress from "@mui/material/CircularProgress";
 import { usersApi } from "../services/api/users";
 import {
   ORGANIZATION_TYPES,
@@ -13,12 +15,13 @@ import Button from "@mui/material/Button";
 import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import Box from "@mui/material/Box";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, X } from "lucide-react";
 import Autocomplete from "@mui/material/Autocomplete";
 import TextField from "@mui/material/TextField";
 import apiClient from "../services/apiClient";
 
 export default function UsersPage() {
+  const { toast } = useToast();
   const [filters, setFilters] = useState({
     isCustomer: false,
     notActive: false,
@@ -108,6 +111,28 @@ export default function UsersPage() {
       </div>
     </div>
   );
+
+  const [deleteUser, setDeleteUser] = useState(null);
+
+  const handleDelete = (row) => {
+    if (row.userName?.toLowerCase() === "admin") {
+      toast("Error: The Admin user cannot be deleted.", "error");
+      return;
+    }
+    setDeleteUser(row);
+  };
+
+  const confirmDelete = () => {
+    if (!deleteUser) return;
+    usersApi
+      .delete(deleteUser.id)
+      .then(() => {
+        toast(`${deleteUser.userName} deleted successfully!`);
+        window.location.reload();
+      })
+      .catch((err) => toast(`Error: ${err.message}`, "error"))
+      .finally(() => setDeleteUser(null));
+  };
 
   const UserModal = ({
     open,
@@ -304,9 +329,14 @@ export default function UsersPage() {
     return (
       <Dialog
         open={open}
-        onClose={onClose}
-        maxWidth="sm"
+        onClose={(event, reason) => {
+          if (reason !== "backdropClick" && reason !== "escapeKeyDown") {
+            onClose();
+          }
+        }}
+        maxWidth="xs"
         fullWidth
+        scroll="body"
         PaperProps={{
           sx: {
             borderRadius: "24px",
@@ -315,10 +345,17 @@ export default function UsersPage() {
           },
         }}
       >
-        <div className="bg-white dark:bg-[#1e2436] px-6 py-5 border-b border-slate-100 dark:border-white/10 shrink-0">
+        <div className="bg-white dark:bg-[#1e2436] px-6 py-5 border-b border-slate-100 dark:border-white/10 shrink-0 flex justify-between items-center">
           <h2 className="text-base dark:text-white text-slate-800 flex items-center gap-2">
             {item ? "Edit User" : "Create User"}
           </h2>
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors rounded-lg hover:bg-slate-100 dark:hover:bg-white/5"
+          >
+            <X size={20} />
+          </button>
         </div>
 
         <form
@@ -451,9 +488,7 @@ export default function UsersPage() {
                     )}
                   </div>
 
-                  <div
-                    className={`grid ${orgType === "1" ? "grid-cols-2 gap-3" : "grid-cols-1"}`}
-                  >
+                  <div className="grid grid-cols-1 gap-2">
                     <div className="w-full">
                       <label className="block text-[10px] text-slate-500 mb-1 ml-1">
                         Organization Type *
@@ -700,7 +735,7 @@ export default function UsersPage() {
 
               {/* TAB 2: ROLES */}
               <div style={{ display: tabIndex === 1 ? "block" : "none" }}>
-                <div className="space-y-4 max-w-sm mx-auto p-4 py-6">
+                <div className="flex flex-col gap-2 w-full p-4 py-6">
                   <p className="text-[11px] text-slate-400 mb-6 text-center">
                     Assign Roles to User
                   </p>
@@ -834,6 +869,7 @@ export default function UsersPage() {
   };
 
   return (
+    <>
     <ResourcePage
       title="Users"
       apiObject={usersApi}
@@ -844,7 +880,7 @@ export default function UsersPage() {
       breadcrumb={["Home", "Administration", "Identity Management", "Users"]}
       smallHeaderButton={true}
       showPagination={true}
-      initialPageSize={10}
+      initialPageSize={14}
       entityName="User"
       customFilterArea={customFilterArea}
       extraParams={{
@@ -853,11 +889,60 @@ export default function UsersPage() {
         mustCompleteJobsheet: filters.mustCompleteJobsheet ? true : undefined,
         isITS: filters.isITS ? true : undefined,
         onlyLoadCurrentUser: filters.onlyLoadCurrentUser ? true : undefined,
+
         organizationTypes: filters.organizationTypes
           ? [parseInt(filters.organizationTypes, 10)]
           : undefined,
       }}
       showAuditLog={false}
+      onDelete={handleDelete}
+      onDeleteVisibilityCheck={(row) => {
+        if (row.userName?.toLowerCase() === "admin") return false;
+        if (filters.isCustomer) return false;
+        const orgType = row.organizationType ?? row.extraProperties?.organizationType;
+        if (orgType === 1) return false;
+        return true;
+      }}
     />
+
+
+    {/* Material UI Delete Confirmation Dialog */}
+    <Dialog
+      open={Boolean(deleteUser)}
+      onClose={() => setDeleteUser(null)}
+      maxWidth="xs"
+      PaperProps={{
+        sx: { borderRadius: "20px", padding: "4px", maxWidth: "320px", width: "100%" },
+      }}
+    >
+      <DialogTitle sx={{ fontWeight: 800, color: "#1e293b", fontSize: "16px" }}>
+        Confirm Deletion
+      </DialogTitle>
+      <DialogContent sx={{ pb: 1 }}>
+        <div className="text-[13px] text-slate-600">
+          Are you sure you want to delete the user{" "}
+          <strong className="text-rose-500">{deleteUser?.userName}</strong>?
+          This action cannot be undone.
+        </div>
+      </DialogContent>
+      <DialogActions sx={{ paddingTop: "10px", paddingBottom: "10px" }}>
+        <Button
+          onClick={() => setDeleteUser(null)}
+          color="inherit"
+          sx={{ fontWeight: 700, borderRadius: "10px", textTransform: "none", fontSize: "12px" }}
+        >
+          Cancel
+        </Button>
+        <Button
+          onClick={confirmDelete}
+          variant="contained"
+          color="error"
+          sx={{ fontWeight: 700, borderRadius: "10px", boxShadow: "none", textTransform: "none", fontSize: "12px" }}
+        >
+          Delete
+        </Button>
+      </DialogActions>
+    </Dialog>
+    </>
   );
 }

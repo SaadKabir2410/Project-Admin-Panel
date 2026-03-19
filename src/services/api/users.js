@@ -25,6 +25,7 @@ export const usersApi = {
       params.ShowCustomers = extraParams.isCustomer;
     }
 
+
     return apiClient
       .get("/api/app/user/paged-list", { params })
       .then((r) => r.data);
@@ -94,17 +95,18 @@ export const usersApi = {
       delete payload.password;
     }
 
-    const createdUser = await apiClient
-      .post("/api/identity/users", payload)
-      .then((r) => r.data);
+    try {
+      const res = await apiClient.post("/api/identity/users", payload);
+      const createdUser = res.data;
 
-    if (roleNames && roleNames.length > 0) {
-      await apiClient.put(`/api/identity/users/${createdUser.id}/roles`, {
-        roleNames,
-      });
+      return { success: true, data: createdUser };
+    } catch (error) {
+      console.error(
+        "CREATE ERROR DETAILS:",
+        JSON.stringify(error.response?.data, null, 2),
+      );
+      throw error;
     }
-
-    return createdUser;
   },
 
   update: async (id, data) => {
@@ -147,14 +149,8 @@ export const usersApi = {
 
     try {
       // Step 4: Update the user
+      // `roleNames` array is mapped properly in `payload`, ABP identity will naturally update the user's roles!
       await apiClient.put(`/api/identity/users/${id}`, payload);
-
-      // Step 5: Update roles separately (required by ABP identity)
-      if (data.roleNames) {
-        await apiClient.put(`/api/identity/users/${id}/roles`, {
-          roleNames: data.roleNames,
-        });
-      }
 
       return { success: true };
     } catch (error) {
@@ -168,6 +164,20 @@ export const usersApi = {
 
   delete: (id) =>
     apiClient.delete(`/api/identity/users/${id}`).then((r) => r.data),
+
+  getPermissions: (userId) =>
+    apiClient
+      .get("/api/permission-management/permissions", {
+        params: { providerName: "U", providerKey: userId },
+      })
+      .then((r) => r.data),
+
+  updatePermissions: (userId, data) =>
+    apiClient
+      .put("/api/permission-management/permissions", data, {
+        params: { providerName: "U", providerKey: userId },
+      })
+      .then((r) => r.data),
 };
 
 export default usersApi;

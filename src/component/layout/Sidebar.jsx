@@ -52,6 +52,35 @@ function NavIcon({ name, size = 18 }) {
 }
 
 export default function Sidebar({ collapsed }) {
+  const { user } = useAuth();
+
+  const filteredGroups = NAV_GROUPS.map((group) => {
+    const validLinks = group.links
+      .filter((link) => {
+        if (link.permission && (!user?.permissions || !user.permissions[link.permission])) {
+          return false;
+        }
+        return true;
+      })
+      .map((link) => {
+        if (link.subMenu) {
+          return {
+            ...link,
+            subMenu: link.subMenu.filter((sub) => {
+              if (sub.permission && (!user?.permissions || !user.permissions[sub.permission])) {
+                return false;
+              }
+              return true;
+            }),
+          };
+        }
+        return link;
+      })
+      .filter((link) => !link.subMenu || link.subMenu.length > 0);
+
+    return { ...group, links: validLinks };
+  }).filter((group) => group.links.length > 0);
+
   return (
     <>
       <aside
@@ -84,9 +113,8 @@ export default function Sidebar({ collapsed }) {
         </div>
 
         {/* Nav Section */}
-
         <nav className="flex-1 px-3 py-4 space-y-6 overflow-y-auto no-scrollbar">
-          {NAV_GROUPS.map((group, idx) => (
+          {filteredGroups.map((group, idx) => (
             <div key={idx} className="space-y-1">
               {!collapsed && (
                 <p className="px-4 text-[12px] tracking-[1.5px] text-slate-500/80 mb-3">

@@ -88,8 +88,8 @@ export const NAV_GROUPS = [
         name: "Identity Management",
         icon: UserCircle,
         subMenu: [
-          { id: "set-users", name: "Users", href: "/users" },
-          { id: "set-roles", name: "Roles", href: "/roles" },
+          { id: "set-users", name: "Users", href: "/users", permission: "AbpIdentity.Users" },
+          { id: "set-roles", name: "Roles", href: "/roles", permission: "AbpIdentity.Roles" },
         ],
       },
     ],

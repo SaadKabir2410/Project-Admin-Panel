@@ -76,14 +76,12 @@ function ActionsMenu({
               onDetail();
               handleClose();
             }}
-            sx={{ py: 1.5 }}
+            sx={{ py: 0.75, minHeight: "32px" }}
           >
-            <ListItemIcon>
-              <Eye size={18} className="text-blue-500" />
-            </ListItemIcon>
+
             <ListItemText
               primary="View Details"
-              primaryTypographyProps={{ fontSize: "13px", fontWeight: 700 }}
+              primaryTypographyProps={{ fontSize: "12px", fontWeight: 600 }}
             />
           </MenuItem>
         )}
@@ -93,14 +91,12 @@ function ActionsMenu({
               onAuditLog();
               handleClose();
             }}
-            sx={{ py: 1.5 }}
+            sx={{ py: 0.75, minHeight: "32px" }}
           >
-            <ListItemIcon>
-              <History size={18} className="text-slate-400" />
-            </ListItemIcon>
+
             <ListItemText
               primary="Audit Log"
-              primaryTypographyProps={{ fontSize: "13px", fontWeight: 700 }}
+              primaryTypographyProps={{ fontSize: "12px", fontWeight: 600 }}
             />
           </MenuItem>
         )}
@@ -110,14 +106,12 @@ function ActionsMenu({
               onPermissions();
               handleClose();
             }}
-            sx={{ py: 1.5 }}
+            sx={{ py: 0.75, minHeight: "32px" }}
           >
-            <ListItemIcon>
-              <SlidersHorizontal size={18} className="text-blue-500" />
-            </ListItemIcon>
+
             <ListItemText
               primary="Permissions"
-              primaryTypographyProps={{ fontSize: "13px", fontWeight: 700 }}
+              primaryTypographyProps={{ fontSize: "12px", fontWeight: 600 }}
             />
           </MenuItem>
         )}
@@ -127,14 +121,12 @@ function ActionsMenu({
               onEdit();
               handleClose();
             }}
-            sx={{ py: 1.5 }}
+            sx={{ py: 0.75, minHeight: "32px" }}
           >
-            <ListItemIcon>
-              <Pencil size={18} className="text-amber-500" />
-            </ListItemIcon>
+
             <ListItemText
               primary="Update Data"
-              primaryTypographyProps={{ fontSize: "13px", fontWeight: 700 }}
+              primaryTypographyProps={{ fontSize: "12px", fontWeight: 600 }}
             />
           </MenuItem>
         )}
@@ -144,14 +136,12 @@ function ActionsMenu({
               onDelete();
               handleClose();
             }}
-            sx={{ py: 1.5 }}
+            sx={{ py: 0.75, minHeight: "32px" }}
           >
-            <ListItemIcon>
-              <Trash2 size={18} className="text-rose-500" />
-            </ListItemIcon>
+
             <ListItemText
               primary="Delete Record"
-              primaryTypographyProps={{ fontSize: "13px", fontWeight: 700 }}
+              primaryTypographyProps={{ fontSize: "12px", fontWeight: 600 }}
             />
           </MenuItem>
         )}
@@ -182,7 +172,7 @@ export default function ResourcePage({
   entityName = "",
   initialSortKey = "id",
   initialSortDir = "desc",
-  initialPageSize = 10,
+  initialPageSize = 14,
   showPagination = true,
   smallHeaderButton = false,
   onPermissions = null,
@@ -725,7 +715,7 @@ export default function ResourcePage({
                     }}
                     className="px-2 py-1 text-[11px] bg-white dark:bg-[#242938] border border-slate-200 dark:border-white/10 rounded-lg outline-none transition-all cursor-pointer shadow-sm"
                   >
-                    {[10, 25, 50, 100].map((s) => (
+                    {[14, 25, 50, 100].map((s) => (
                       <option key={s} value={s}>
                         {s}
                       </option>
