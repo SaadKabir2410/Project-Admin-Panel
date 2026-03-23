@@ -22,6 +22,7 @@ import AfterWorkingHoursReportPage from "./pages/AfterWorkingHoursReportPage";
 import UsersPage from "./pages/UsersPage";
 import RolesPage from "./pages/RolesPage";
 import TaskCategoryProjectsPage from "./pages/TaskCategoryProjectsPage";
+import CodeDetailsPage from "./pages/CodeDetailsPage";
 
 function Layout({ collapsed, setCollapsed }) {
   return (
@@ -53,6 +54,7 @@ function Layout({ collapsed, setCollapsed }) {
             <Route path="/users" element={<UsersPage />} />
             <Route path="/roles" element={<RolesPage />} />
             <Route path="/task-category-projects" element={<TaskCategoryProjectsPage />} />
+            <Route path="/code-details" element={<CodeDetailsPage />} />
 
             <Route path="/audit-logs" element={<AuditLogsPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />

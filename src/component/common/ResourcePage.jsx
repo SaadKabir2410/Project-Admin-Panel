@@ -111,7 +111,7 @@ export default function ResourcePage({
   extraParams = {},
   initialFilterField = "",
   initialFilterValue = "",
-  detailViewMode = "modal", // 'modal' or 'side'
+  detailViewMode = "modal",
   SecondaryDetailComponent = null,
   entityName = "",
   initialSortKey = "id",
@@ -130,6 +130,7 @@ export default function ResourcePage({
   onEnableVisibilityCheck = null,
   onEditVisibilityCheck = null,
   hideActionsCheck = null,
+  onRefetchReady = null, // ✅ NEW PROP
 }) {
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -222,6 +223,13 @@ export default function ResourcePage({
     params,
   );
 
+  // ✅ Expose refetch to parent via onRefetchReady
+  useEffect(() => {
+    if (onRefetchReady) {
+      onRefetchReady(refetch);
+    }
+  }, [refetch, onRefetchReady]);
+
   useEffect(() => {
     if (error && sortKey !== "id") {
       setSortKey("id");
@@ -244,21 +252,15 @@ export default function ResourcePage({
       );
     }
 
-    // --- Premium Frontend Sorting with Update Boost ---
     filtered.sort((a, b) => {
-      // 1. Boost most recently touched item to row 1
       if (lastModifiedId) {
         if (a.id === lastModifiedId) return -1;
         if (b.id === lastModifiedId) return 1;
       }
 
-      // 2. Default Sort Strategy (Timestamp based if possible)
-      // If user hasn't touched the sort, or it's 'id', we try to show latest modifications first
       let effectiveKey = sortKey;
 
-      // Comparison logic
       const getVal = (item, key) => {
-        // If it's the default sort, try modification dates first to satisfy "updates show first"
         if (key === "id") {
           return (
             item.lastModificationTime ||
@@ -332,7 +334,7 @@ export default function ResourcePage({
         error.response?.data?.message ||
         error.message;
       setCreateError(msg);
-      throw error; // Let modal catch it if it wants
+      throw error;
     } finally {
       setCreateLoading(false);
     }
@@ -357,7 +359,7 @@ export default function ResourcePage({
         error.response?.data?.message ||
         error.message;
       setUpdateError(msg);
-      throw error; // Let modal catch it if it wants
+      throw error;
     } finally {
       setUpdateLoading(false);
     }
@@ -506,7 +508,6 @@ export default function ResourcePage({
 
   return (
     <div className="h-full flex flex-col overflow-hidden animate-in fade-in duration-500">
-      {/* ── Standard Card Layout ─────────────────── */}
       <div className="bg-white dark:bg-[#1e2436] rounded-2xl border border-slate-200 dark:border-white/10 shadow-xl overflow-hidden flex flex-col flex-1">
         {/* Header Section */}
         <div className="px-6 py-4 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/2 shrink-0">
@@ -555,7 +556,6 @@ export default function ResourcePage({
                       : "flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-xl shadow-lg shadow-blue-100 dark:shadow-none transition-all active:scale-95"
                   }
                 >
-
                   {createButtonText}
                 </button>
               )}
@@ -569,13 +569,12 @@ export default function ResourcePage({
             <div className="flex items-center gap-6 flex-1 min-w-[300px]">
               {showSearchBar && (
                 <div className="relative w-full max-w-[280px] group">
-
                   <input
                     type="text"
                     placeholder={searchPlaceholder}
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2.5 text-xs bg-slate-50 dark:bg-[#242938] border border-slate-200 dark:border-white/10 rounded-xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:bg-white dark:focus:bg-[#242938] transition-all "
+                    className="w-full pl-9 pr-3 py-2.5 text-xs bg-slate-50 dark:bg-[#242938] border border-slate-200 dark:border-white/10 rounded-xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:bg-white dark:focus:bg-[#242938] transition-all"
                   />
                 </div>
               )}
@@ -584,16 +583,14 @@ export default function ResourcePage({
           </div>
         )}
 
-        {/* Main Content (Split/Scroll) */}
+        {/* Main Content */}
         <div className="flex-1 flex min-h-0 relative">
-          {/* Left: Table */}
           <div className="flex-1 flex flex-col min-w-0">
             {error && (
               <div className="m-8 p-4 bg-red-50 border border-red-100 rounded-2xl flex items-center gap-3 text-red-600 animate-in fade-in slide-in-from-top-4">
-
                 <div className="flex-1">
-                  <p className="text-sm ">Failed to load data</p>
-                  <p className="text-xs opacity-80 ">
+                  <p className="text-sm">Failed to load data</p>
+                  <p className="text-xs opacity-80">
                     {error.message || "Unknown network error"}
                   </p>
                 </div>
@@ -634,7 +631,6 @@ export default function ResourcePage({
                       fontWeight: 800,
                       fontSize: "10px",
                       color: "rgb(71 85 105)",
-                      textTransform: "",
                       letterSpacing: "0.05em",
                     },
                   },
@@ -652,7 +648,6 @@ export default function ResourcePage({
                   noRowsOverlay: () => (
                     <div className="h-full flex flex-col items-center justify-center p-10 space-y-4">
                       <div className="w-16 h-16 bg-slate-50 dark:bg-white/5 rounded-3xl flex items-center justify-center text-slate-300 dark:text-slate-600 border border-slate-100 dark:border-white/5">
-
                       </div>
                       <div className="text-center">
                         <p className="text-sm text-slate-800 dark:text-white tracking-tighter">
@@ -665,7 +660,7 @@ export default function ResourcePage({
               />
             </div>
 
-            {/* Standard Pagination Footer */}
+            {/* Pagination Footer */}
             {showPagination && (
               <div className="px-6 py-3 border-t border-slate-100 dark:border-white/5 bg-slate-50/30 dark:bg-white/1 flex items-center justify-between shrink-0">
                 <div className="flex items-center gap-3">
@@ -693,7 +688,7 @@ export default function ResourcePage({
                     <span className="text-slate-900 dark:text-white">
                       {Math.min(page * pageSize, displayTotal)}
                     </span>
-                    <span className="text-slate-400 "> of </span>
+                    <span className="text-slate-400"> of </span>
                     <span className="text-slate-900 dark:text-white">
                       {displayTotal}
                     </span>
@@ -705,7 +700,6 @@ export default function ResourcePage({
                     disabled={page === 1 || loading}
                     className="p-1.5 rounded-lg border border-slate-200 dark:border-white/10 disabled:opacity-30 hover:bg-white dark:hover:bg-white/5 transition-all shadow-sm flex items-center justify-center bg-white"
                   >
-
                   </button>
                   <button
                     onClick={handlePrevPage}
@@ -715,7 +709,7 @@ export default function ResourcePage({
                     Prev
                   </button>
                   <div className="px-4 py-1.5 bg-blue-500 text-white rounded-lg text-[11px] shadow-md shadow-blue-500/25">
-                    Page {page} of {displayTotalPages || 1}{" "}
+                    Page {page} of {displayTotalPages || 1}
                   </div>
                   <button
                     onClick={handleNextPage}
@@ -729,14 +723,13 @@ export default function ResourcePage({
                     disabled={page >= displayTotalPages || loading}
                     className="p-1.5 rounded-lg border border-slate-200 dark:border-white/10 disabled:opacity-30 hover:bg-white dark:hover:bg-white/5 transition-all shadow-sm flex items-center justify-center bg-white"
                   >
-
                   </button>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Right: Side Panel (Master-Detail) */}
+          {/* Side Panel */}
           {sidePanelOpen && SecondaryDetailComponent && (
             <div className="w-[600px] border-l border-slate-200 dark:border-white/10 bg-white dark:bg-[#1e2436] flex flex-col shadow-2xl animate-in slide-in-from-right duration-500 z-50">
               <div className="px-6 py-5 border-b border-slate-100 dark:border-white/5 flex items-center justify-between bg-slate-50/50 dark:bg-white/2">
@@ -744,7 +737,7 @@ export default function ResourcePage({
                   <h3 className="text-lg text-slate-800 dark:text-white tracking-tighter">
                     Review Details
                   </h3>
-                  <p className="text-[10px] text-blue-500 ">
+                  <p className="text-[10px] text-blue-500">
                     Entry ID: {activeItem?.id?.slice(0, 8)}...
                   </p>
                 </div>
@@ -752,7 +745,6 @@ export default function ResourcePage({
                   onClick={() => setSidePanelOpen(false)}
                   className="p-2 hover:bg-red-50 hover:text-red-500 transition-all rounded-xl border border-transparent hover:border-red-100"
                 >
-
                 </button>
               </div>
               <div className="flex-1 overflow-y-auto">
@@ -766,7 +758,7 @@ export default function ResourcePage({
         </div>
       </div>
 
-      {/* Modals Transferred from Bottom */}
+      {/* Modals */}
       {ModalComponent && (
         <>
           <ModalComponent

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import ResourcePage from "../component/common/ResourcePage";
 import codesApi from "../services/api/Code";
 import CodeModal from "../component/common/CodeModal";
@@ -7,43 +7,42 @@ import { useToast } from "../component/common/ToastContext";
 
 export default function CodePage() {
   const { toast } = useToast();
-  
-  // Action states (Enable/Disable)
+  const refetchRef = useRef(null);
+
   const [actionItem, setActionItem] = useState(null);
-  const [actionType, setActionType] = useState(""); // "disable" or "enable"
+  const [actionType, setActionType] = useState("");
   const [loading, setLoading] = useState(false);
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   const columns = [
     { key: "lookupCode", label: "LOOKUP CODE", bold: true },
     { key: "description", label: "DESCRIPTION", minWidth: 200, flex: 2 },
     { key: "sequence", label: "SEQUENCE" },
-    { 
-      key: "isSystemIndicator", 
+    {
+      key: "isSystemIndicator",
       label: "SYSTEM INDICATOR",
-      render: (val, row) => (
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input 
-            type="checkbox" 
-            checked={row.isSystemIndicator === true} 
+      render: (val) => (
+        <div className="flex items-center w-full h-full">
+          <input
+            type="checkbox"
+            checked={!!val}
             readOnly
-            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 cursor-default pointer-events-none" 
+            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 cursor-default pointer-events-none"
           />
-        </label>
+        </div>
       )
     },
-    { 
-      key: "isActive", 
+    {
+      key: "isActive",
       label: "ACTIVE",
-      render: (val, row) => (
-        <label className="flex items-center gap-2 cursor-pointer">
-          <input 
-            type="checkbox" 
-            checked={row.isActive === true} 
+      render: (val) => (
+        <div className="flex items-center w-full h-full">
+          <input
+            type="checkbox"
+            checked={!!val}
             readOnly
-            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 cursor-default pointer-events-none" 
+            className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 cursor-default pointer-events-none"
           />
-        </label>
+        </div>
       )
     },
   ];
@@ -51,7 +50,6 @@ export default function CodePage() {
   const confirmAction = async () => {
     if (!actionItem) return;
     setLoading(true);
-    
     try {
       if (actionType === "disable") {
         await codesApi.disable(actionItem.id);
@@ -60,8 +58,9 @@ export default function CodePage() {
         await codesApi.enable(actionItem.id);
         toast(`Record enabled successfully!`);
       }
-      // Refresh list seamlessly without breaking React UX
-      setRefreshTrigger(prev => prev + 1);
+      if (refetchRef.current) {
+        await refetchRef.current();
+      }
     } catch (err) {
       const msg = err.response?.data?.error?.message || err.message || "An error occurred.";
       toast(`Failed to ${actionType} record: ${msg}`, "error");
@@ -86,7 +85,7 @@ export default function CodePage() {
         showFilterBar={false}
         showPagination={false}
         entityName="Lookup"
-        extraParams={{ _refresh: refreshTrigger }}
+        onRefetchReady={(fn) => { refetchRef.current = fn; }}
         onDisable={(row) => {
           setActionItem(row);
           setActionType("disable");
