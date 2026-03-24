@@ -19,6 +19,7 @@ export default function WorkCodesPage() {
       breadcrumb={["Home", "Management", "Lookups", "Work Done Codes"]}
       showSearchBar={true}
       showFilterBar={false}
+      showActions={true}
       entityName="WorkDoneCode"
     />
   );

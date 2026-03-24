@@ -1,9 +1,11 @@
+import { Home, Ticket, FileText, Briefcase, Database, Shield, Settings } from "lucide-react";
+
 export const NAV_GROUPS = [
   {
     title: "Main Menu",
     links: [
-      { id: "main-dashboard", name: "Dashboard", href: "/" },
-      { id: "main-tickets", name: "AMS Tickets", href: "/ams-tickets" },
+      { id: "main-Home", name: "Home", href: "/", icon: Home },
+      { id: "main-tickets", name: "AMS Tickets", href: "/ams-tickets", icon: Ticket },
     ],
   },
   {
@@ -13,6 +15,7 @@ export const NAV_GROUPS = [
         id: "mgmt-report",
         name: "Reports",
         href: "/reports",
+        icon: FileText,
         subMenu: [
           { id: "sub-reports-tickets", name: "AMS Tickets Report", href: "/reports/tickets" },
           { id: "sub-reports-general", name: "General Report", href: "/reports/general" },
@@ -20,10 +23,11 @@ export const NAV_GROUPS = [
           { id: "sub-reports-commission", name: "Ticket Commission Report", href: "/reports/commission" },
         ],
       },
-      { id: "mgmt-jobsheets", name: "Jobsheets", href: "/jobsheets" },
+      { id: "mgmt-jobsheets", name: "Jobsheets", href: "/jobsheets", icon: Briefcase },
       {
         id: "lookup-master",
         name: "Lookups",
+        icon: Database,
         subMenu: [
           { id: "lookup-hours", name: "User Working Hours", href: "/working-hours" },
           { id: "lookup-sites", name: "Sites", href: "/sites" },
@@ -43,10 +47,17 @@ export const NAV_GROUPS = [
       {
         id: "set-identity",
         name: "Identity Management",
+        icon: Shield,
         subMenu: [
           { id: "set-users", name: "Users", href: "/users", permission: "AbpIdentity.Users" },
           { id: "set-roles", name: "Roles", href: "/roles", permission: "AbpIdentity.Roles" },
         ],
+      },
+      {
+        id: "set-settings",
+        name: "Settings",
+        icon: Settings,
+        href: "/settings",
       },
     ],
   },

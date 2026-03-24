@@ -52,10 +52,10 @@ export default function CodeDetailsPage() {
   };
 
   const getInputStyle = (width = "w-full") => 
-    `h-[36px] bg-[#f1f3f5] dark:bg-slate-800 rounded-[10px] px-3 text-sm outline-none border border-transparent focus:border-blue-500 transition-colors ${width}`;
+    `h-[32px] bg-[#f1f3f5] dark:bg-slate-800 rounded-lg px-2.5 text-xs outline-none border border-transparent focus:border-blue-500 transition-colors ${width}`;
 
   const getTextAreaStyle = (width = "w-full") => 
-    `h-[40px] py-2 resize-none no-scrollbar bg-[#f1f3f5] dark:bg-slate-800 rounded-[10px] px-3 text-xs leading-tight outline-none border border-transparent focus:border-blue-500 transition-colors break-words ${width}`;
+    `h-[34px] py-1.5 resize-none no-scrollbar bg-[#f1f3f5] dark:bg-slate-800 rounded-lg px-2.5 text-xs leading-tight outline-none border border-transparent focus:border-blue-500 transition-colors break-words ${width}`;
 
   const columns = [
     { 
@@ -145,15 +145,19 @@ export default function CodeDetailsPage() {
   ];
 
   const customSearch = (
-    <div className="w-full py-1">
-      <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5 pl-1">
-        Lookup Code <span className="text-red-500">*</span>
-      </label>
-      <input
-        type="text"
-        placeholder="Search Code..."
-        className="w-full px-4 py-2.5 bg-[#f8f9fa] dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:ring-2 focus:ring-blue-500 text-sm transition-all"
-      />
+    <div className="flex items-end gap-3 w-full sm:w-auto mt-4 sm:mt-0 flex-1">
+      <div className="flex flex-col flex-1 min-w-[300px] w-full max-w-[80%] relative">
+        <span className="block text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1.5 ml-1">
+          LOOKUP CODE <span className="text-red-500">*</span>
+        </span>
+        <div className="relative w-full">
+          <input
+            type="text"
+            placeholder="Search Code..."
+            className="w-full bg-slate-50 border border-slate-200 dark:bg-[#242938] dark:border-slate-600/50 text-slate-700 dark:text-slate-300 text-xs rounded-lg pl-3 pr-8 py-2 outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-500/10 transition-all box-border shadow-sm"
+          />
+        </div>
+      </div>
     </div>
   );
 

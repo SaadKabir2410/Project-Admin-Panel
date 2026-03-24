@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useTheme } from "../../context/ThemeContext";
 import { useAuth } from "../../context/AuthContextHook";
-
+import { Menu as MenuIcon, Moon, Sun, User, LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 function IconBtn({
   children,
@@ -28,28 +29,21 @@ export default function Navbar({ setCollapsed }) {
   const { dark, setDark } = useTheme();
   const { user, logout } = useAuth();
   const [showMenu, setShowMenu] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <header className="sticky top-0 z-40 flex items-center justify-between gap-4 px-6 py-3 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md border-b border-slate-200/60 dark:border-white/5">
       <div className="flex items-center gap-4">
-        <IconBtn
-          onClick={() => setCollapsed((c) => !c)}
-          title="toggle sidebar"
-          className="hover:bg-slate-100 dark:hover:bg-slate-800 px-3"
-        >
-          <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Menu</span>
-        </IconBtn>
-
-        {/* ... rest of left side ... */}
+        {/* Left side actions (if any) can go here */}
       </div>
 
       <div className="flex items-center gap-1.5 ml-auto">
-        {/* ... theme and other buttons ... */}
         <IconBtn
           onClick={() => setDark(dark === "light" ? "dark" : "light")}
           title="toggle theme"
-          className="px-3"
+          className="px-3 flex items-center gap-2"
         >
+          {dark === "dark" ? <Sun size={14} className="text-slate-400" /> : <Moon size={14} className="text-slate-600" />}
           <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">
             {dark === "dark" ? "Light" : "Dark"} Mode
           </span>
@@ -57,10 +51,6 @@ export default function Navbar({ setCollapsed }) {
 
         <IconBtn title="Language" className="hidden sm:flex px-3">
           <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">EN</span>
-        </IconBtn>
-
-        <IconBtn badge title="Notifications" className="px-3">
-          <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">Alerts</span>
         </IconBtn>
 
         <div className="w-px h-6 bg-slate-200 dark:bg-white/10 mx-2" />
@@ -91,9 +81,20 @@ export default function Navbar({ setCollapsed }) {
                 </p>
               </div>
               <button
-                onClick={logout}
-                className="w-full text-center px-4 py-2 text-sm text-red-500 font-semibold hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+                onClick={() => {
+                  setShowMenu(false);
+                  navigate("/my-account");
+                }}
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-slate-600 dark:text-slate-300 font-medium hover:bg-slate-50 dark:hover:bg-white/5 transition-colors"
               >
+                <User size={16} />
+                My Account
+              </button>
+              <button
+                onClick={logout}
+                className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-500 font-medium hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors"
+              >
+                <LogOut size={16} />
                 Logout
               </button>
             </div>

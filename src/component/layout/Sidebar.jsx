@@ -1,14 +1,13 @@
 import { useState } from "react";
-
 import clsx from "clsx";
 import { NAV_GROUPS } from "../../data/navData";
 import { useAuth } from "../../context/AuthContextHook";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Menu as MenuIcon } from "lucide-react";
 
-
-export default function Sidebar({ collapsed }) {
+export default function Sidebar({ collapsed, setCollapsed }) {
   const { user } = useAuth();
-
+  
+  // ... filtered groups ...
   const filteredGroups = NAV_GROUPS.map((group) => {
     const validLinks = group.links
       .filter((link) => {
@@ -56,23 +55,35 @@ export default function Sidebar({ collapsed }) {
         {/* Logo section */}
         <div
           className={clsx(
-            "flex items-center gap-3 border-b border-white/5 transition-all duration-300",
-            collapsed ? "justify-center px-4 py-[20px]" : "px-6 py-[24px]",
+            "flex border-b border-white/5 transition-all duration-300 relative",
+            collapsed ? "flex-col items-center justify-center py-5 gap-5" : "items-center px-6 py-6 gap-3",
           )}
         >
           <div className="w-9 h-9 rounded-xl bg-linear-to-tr from-blue-600 to-indigo-500 flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/20 text-white font-bold text-sm">
             S
           </div>
+
           {!collapsed && (
-            <div className="flex flex-col animate-fade-in">
-              <span className=" text-[15px] leading-none text-white ">
+            <div className="flex flex-col animate-fade-in flex-1 overflow-hidden">
+              <span className=" text-[15px] leading-none text-white truncate">
                 Sureze
               </span>
-              <span className="text-[10px] text-blue-400 tracking-[2px] mt-1 ">
+              <span className="text-[10px] text-blue-400 tracking-[2px] mt-1 truncate">
                 Dashboard
               </span>
             </div>
           )}
+
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            title="Toggle Sidebar"
+            className={clsx(
+              "flex items-center justify-center p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-white/10 transition-colors shrink-0",
+              !collapsed && "ml-auto"
+            )}
+          >
+            <MenuIcon size={collapsed ? 24 : 20} />
+          </button>
         </div>
 
         {/* Nav Section */}
@@ -105,6 +116,7 @@ function NavItem({ item, collapsed }) {
     item.subMenu.some((sub) => window.location.pathname === sub.href);
   const active = window.location.pathname === item.href || isChildActive;
   const [isOpen, setIsOpen] = useState(isChildActive);
+  const Icon = item.icon;
 
   const handleClick = (e) => {
     if (hasSubMenu) {
@@ -127,6 +139,12 @@ function NavItem({ item, collapsed }) {
         )}
         title={collapsed ? item.name : ""}
       >
+        {Icon && (
+          <div className={clsx("flex items-center justify-center shrink-0", collapsed ? "w-6 h-6" : "w-5 h-5")}>
+            <Icon size={collapsed ? 20 : 18} strokeWidth={2} className={clsx("transition-colors", active ? "text-blue-500" : "text-slate-400 group-hover:text-white")} />
+          </div>
+        )}
+        
         {!collapsed && (
           <span
             className={clsx(
@@ -139,7 +157,7 @@ function NavItem({ item, collapsed }) {
         )}
 
         {/* Empty placeholder for collapsed state if needed, or just let text handle it */}
-        {collapsed && (
+        {collapsed && !Icon && (
           <span className="text-sm font-medium tracking-tight truncate max-w-[40px]">
             {item.name.substring(0, 3)}
           </span>

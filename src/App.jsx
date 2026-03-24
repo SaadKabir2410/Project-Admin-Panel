@@ -23,16 +23,18 @@ import UsersPage from "./pages/UsersPage";
 import RolesPage from "./pages/RolesPage";
 import TaskCategoryProjectsPage from "./pages/TaskCategoryProjectsPage";
 import CodeDetailsPage from "./pages/CodeDetailsPage";
+import SettingsPage from "./pages/SettingsPage";
+import MyAccountPage from "./pages/MyAccountPage";
 
 function Layout({ collapsed, setCollapsed }) {
   return (
     <div className="flex h-screen w-screen dark:bg-slate-950 bg-slate-50 text-slate-900 dark:text-white transition-colors duration-300">
-      <Sidebar collapsed={collapsed} />
+      <Sidebar collapsed={collapsed} setCollapsed={setCollapsed} />
       <div className="flex flex-col flex-1 h-screen overflow-hidden">
         <Navbar Collapsed={collapsed} setCollapsed={setCollapsed} />
         <main className="flex-1 overflow-auto p-6 bg-slate-50 dark:bg-[#020617] transition-colors duration-300">
           <Routes>
-            <Route path="/" element={<Dashboard />} />
+            <Route path="/" element={<AMSTicketsPage />} />
             <Route path="/ams-tickets" element={<AMSTicketsPage />} />
             <Route path="/sites" element={<SitesPage />} />
             <Route path="/countries" element={<CountriesPage />} />
@@ -55,6 +57,9 @@ function Layout({ collapsed, setCollapsed }) {
             <Route path="/roles" element={<RolesPage />} />
             <Route path="/task-category-projects" element={<TaskCategoryProjectsPage />} />
             <Route path="/code-details" element={<CodeDetailsPage />} />
+            <Route path="/settings" element={<SettingsPage />} />
+            <Route path="/my-account" element={<MyAccountPage />} />
+
 
             <Route path="/audit-logs" element={<AuditLogsPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />

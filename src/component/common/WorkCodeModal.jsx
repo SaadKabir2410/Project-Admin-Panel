@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Dialog, IconButton } from "@mui/material";
+import { AlertCircle, Check } from "lucide-react";
 
 import { workCodesApi } from "../../services/api/workCodes";
 
@@ -90,14 +91,10 @@ export default function WorkCodeModal({
 
     if (!desc) {
       errs.description = "Description is required";
-    } else if (desc.length > 250) {
-      errs.description = "Maximum Length 250";
     }
 
     if (!code) {
       errs.code = "Code is required";
-    } else if (code.length > 8) {
-      errs.code = "Maximum 8 Character";
     }
     return errs;
   };
@@ -110,6 +107,7 @@ export default function WorkCodeModal({
       return;
     }
     if (errors.code || checkingCode) return;
+    setErrors({});
 
     const payload = {
       Description: form.description.trim(),
@@ -120,14 +118,32 @@ export default function WorkCodeModal({
       const finalPayload = isEdit ? { ...item, ...payload } : payload;
       await onSubmit(finalPayload);
     } catch (err) {
-      const msg =
+      const validationErrors = err.response?.data?.error?.validationErrors;
+      let msg =
         err.response?.data?.error?.message ||
         err.response?.data?.message ||
         err.message;
-      if (msg.toLowerCase().includes("code")) {
-        setErrors((prev) => ({ ...prev, code: msg }));
+
+      if (validationErrors && validationErrors.length > 0) {
+        const newErrs = {};
+        for (const ve of validationErrors) {
+          const members = ve.members || [];
+          if (members.length === 0) newErrs.server = ve.message;
+          members.forEach((m) => {
+            if (m.toLowerCase() === "code") newErrs.code = ve.message;
+            else if (m.toLowerCase() === "description") newErrs.description = ve.message;
+            else newErrs.server = ve.message;
+          });
+        }
+        setErrors((prev) => ({ ...prev, ...newErrs }));
       } else {
-        setErrors((prev) => ({ ...prev, server: msg }));
+        if (msg.toLowerCase().includes("code")) {
+          setErrors((prev) => ({ ...prev, code: msg }));
+        } else if (msg.toLowerCase().includes("description")) {
+          setErrors((prev) => ({ ...prev, description: msg }));
+        } else {
+          setErrors((prev) => ({ ...prev, server: msg }));
+        }
       }
     }
   };
@@ -161,9 +177,9 @@ export default function WorkCodeModal({
       </div>
 
       <div className="px-6 py-2 space-y-5">
-        {(submitError || errors.server) && (
+        {errors.server && (
           <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-xs animate-in fade-in slide-in-from-top-2">
-            {submitError || errors.server}
+            {errors.server}
           </div>
         )}
         <div>
@@ -173,7 +189,6 @@ export default function WorkCodeModal({
           <div className="relative">
             <input
               type="text"
-              maxLength={12} // Slightly higher than 8 to allow seeing the validation message if pasted
               placeholder="Enter Code"
               value={form.code}
               onChange={(e) => {
@@ -208,7 +223,6 @@ export default function WorkCodeModal({
           <div className="relative">
             <input
               type="text"
-              maxLength={300} // Slightly higher than 250 to allow seeing the validation message if pasted
               placeholder="Enter Description"
               value={form.description}
               onChange={(e) => {

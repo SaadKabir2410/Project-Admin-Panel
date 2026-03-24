@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContextHook";
-
+import { useTheme } from "../../context/ThemeContext";
 import { DataGrid, getGridStringOperators } from "@mui/x-data-grid";
 import { useResource } from "../hooks/useResource";
 import { useToast } from "./ToastContext";
@@ -32,7 +32,7 @@ function ActionsMenu({
     <div>
       <button
         onClick={handleClick}
-        className="h-[30px] w-fit px-3 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-medium rounded-lg transition-all inline-flex items-center justify-center gap-1 shadow-sm"
+        className="h-[28px] w-fit px-3 bg-white dark:bg-transparent border border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-500/10 text-blue-500 text-[10px] font-medium rounded-lg transition-all inline-flex items-center justify-center gap-1 shadow-sm"
       >
         Actions <ChevronDown size={12} strokeWidth={2.5} />
       </button>
@@ -130,8 +130,12 @@ export default function ResourcePage({
   onEnableVisibilityCheck = null,
   onEditVisibilityCheck = null,
   hideActionsCheck = null,
-  onRefetchReady = null, // ✅ NEW PROP
+  onRefetchReady = null,
+  hideGrid = false,
+  wideSearch = false,
 }) {
+  const { dark } = useTheme();
+  const isDark = dark === "dark";
   const { toast } = useToast();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
@@ -432,7 +436,7 @@ export default function ResourcePage({
     }));
 
     if (showActions) {
-      cols.unshift({
+      cols.push({
         field: "actions",
         headerName: "",
         width: 100,
@@ -547,13 +551,13 @@ export default function ResourcePage({
             </div>
             <div className="flex items-center gap-3">
               {customHeaderActions}
-              {apiObject.create && ModalComponent && (
+              {apiObject.create && ModalComponent && createButtonText && (
                 <button
                   onClick={() => setModals((m) => ({ ...m, create: true }))}
                   className={
                     smallHeaderButton
-                      ? "px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-[11px] rounded-lg shadow-md transition-all active:scale-95"
-                      : "flex items-center gap-2 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-xl shadow-lg shadow-blue-100 dark:shadow-none transition-all active:scale-95"
+                      ? "px-3 py-1.5 bg-white border border-blue-500 text-blue-500 hover:bg-blue-50 dark:bg-transparent dark:hover:bg-blue-500/10 rounded-lg text-xs font-medium transition-colors shadow-sm shrink-0 active:scale-95"
+                      : "px-4 py-2 bg-white border border-blue-500 text-blue-500 hover:bg-blue-50 dark:bg-transparent dark:hover:bg-blue-500/10 rounded-lg text-[13px] font-medium transition-colors shadow-sm shrink-0 active:scale-95"
                   }
                 >
                   {createButtonText}
@@ -566,15 +570,15 @@ export default function ResourcePage({
         {/* Toolbar Section */}
         {(showSearchBar || showFilterBar || customFilterArea) && (
           <div className="px-6 py-3 border-b border-slate-100 dark:border-white/5 flex items-center justify-between bg-white dark:bg-transparent shrink-0 flex-wrap gap-4">
-            <div className="flex items-center gap-6 flex-1 min-w-[300px]">
+            <div className={`flex items-center gap-6 flex-1 min-w-[300px] ${wideSearch ? "max-w-2xl" : "max-w-[400px]"}`}>
               {showSearchBar && (
-                <div className="relative w-full max-w-[280px] group">
+                <div className="relative w-full group">
                   <input
                     type="text"
                     placeholder={searchPlaceholder}
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
-                    className="w-full pl-9 pr-3 py-2.5 text-xs bg-slate-50 dark:bg-[#242938] border border-slate-200 dark:border-white/10 rounded-xl outline-none focus:ring-4 focus:ring-blue-500/10 focus:bg-white dark:focus:bg-[#242938] transition-all"
+                    className="w-full pl-8 pr-3 py-2 text-xs bg-slate-50 dark:bg-[#242938] border border-slate-200 dark:border-white/10 rounded-lg outline-none focus:ring-4 focus:ring-blue-500/10 focus:bg-white dark:focus:bg-[#242938] transition-all"
                   />
                 </div>
               )}
@@ -602,63 +606,67 @@ export default function ResourcePage({
                 </button>
               </div>
             )}
-            <div className="flex-1 overflow-hidden">
-              <DataGrid
-                rows={visibleData}
-                columns={muiColumns}
-                rowCount={displayTotal || 0}
-                loading={loading}
-                paginationMode="server"
-                sortingMode="server"
-                onSortModelChange={(m) => {
-                  if (m.length) {
-                    setSortKey(m[0].field);
-                    setSortDir(m[0].sort);
-                  }
-                }}
-                hideFooter
-                disableRowSelectionOnClick
-                rowHeight={48}
-                columnHeaderHeight={48}
-                sx={{
-                  border: "none",
-                  "& .MuiDataGrid-columnHeaders": {
-                    bgcolor: "rgba(248, 250, 252, 0.8)",
-                    borderBottom: "2px solid rgba(226, 232, 240, 1)",
-                    minHeight: "48px !important",
-                    maxHeight: "48px !important",
-                    "& .MuiDataGrid-columnHeaderTitle": {
-                      fontWeight: 800,
-                      fontSize: "10px",
-                      color: "rgb(71 85 105)",
-                      letterSpacing: "0.05em",
+            {hideGrid ? (
+              <div className="flex-1 overflow-hidden min-h-[400px] bg-white dark:bg-[#1e2436]"></div>
+            ) : (
+              <div className="flex-1 overflow-hidden">
+                <DataGrid
+                  rows={visibleData}
+                  columns={muiColumns}
+                  rowCount={displayTotal || 0}
+                  loading={loading}
+                  paginationMode="server"
+                  sortingMode="server"
+                  onSortModelChange={(m) => {
+                    if (m.length) {
+                      setSortKey(m[0].field);
+                      setSortDir(m[0].sort);
+                    }
+                  }}
+                  hideFooter
+                  disableRowSelectionOnClick
+                  rowHeight={44}
+                  columnHeaderHeight={44}
+                  sx={{
+                    border: "none",
+                    "& .MuiDataGrid-columnHeaders": {
+                      bgcolor: isDark ? "rgba(30, 41, 59, 0.8)" : "rgba(248, 250, 252, 0.8)",
+                      borderBottom: isDark ? "2px solid rgba(51, 65, 85, 1)" : "2px solid rgba(226, 232, 240, 1)",
+                      minHeight: "44px !important",
+                      maxHeight: "44px !important",
+                      "& .MuiDataGrid-columnHeaderTitle": {
+                        fontWeight: 800,
+                        fontSize: "10px",
+                        color: isDark ? "rgba(148, 163, 184, 1)" : "rgb(71 85 105)",
+                        letterSpacing: "0.05em",
+                      },
                     },
-                  },
-                  "& .MuiDataGrid-cell": {
-                    borderColor: "rgba(241, 245, 249, 1)",
-                    display: "flex",
-                    alignItems: "center",
-                    color: "inherit",
-                  },
-                  "& .MuiDataGrid-row:hover": {
-                    bgcolor: "rgba(59, 130, 246, 0.04)",
-                  },
-                }}
-                slots={{
-                  noRowsOverlay: () => (
-                    <div className="h-full flex flex-col items-center justify-center p-10 space-y-4">
-                      <div className="w-16 h-16 bg-slate-50 dark:bg-white/5 rounded-3xl flex items-center justify-center text-slate-300 dark:text-slate-600 border border-slate-100 dark:border-white/5">
+                    "& .MuiDataGrid-cell": {
+                      borderColor: isDark ? "rgba(51, 65, 85, 0.5)" : "rgba(241, 245, 249, 1)",
+                      display: "flex",
+                      alignItems: "center",
+                      color: "inherit",
+                    },
+                    "& .MuiDataGrid-row:hover": {
+                      bgcolor: isDark ? "rgba(59, 130, 246, 0.1)" : "rgba(59, 130, 246, 0.04)",
+                    },
+                  }}
+                  slots={{
+                    noRowsOverlay: () => (
+                      <div className="h-full flex flex-col items-center justify-center p-10 space-y-4">
+                        <div className="w-16 h-16 bg-slate-50 dark:bg-white/5 rounded-3xl flex items-center justify-center text-slate-300 dark:text-slate-600 border border-slate-100 dark:border-white/5">
+                        </div>
+                        <div className="text-center">
+                          <p className="text-sm text-slate-800 dark:text-white tracking-tighter">
+                            No records found
+                          </p>
+                        </div>
                       </div>
-                      <div className="text-center">
-                        <p className="text-sm text-slate-800 dark:text-white tracking-tighter">
-                          No records found
-                        </p>
-                      </div>
-                    </div>
-                  ),
-                }}
-              />
-            </div>
+                    ),
+                  }}
+                />
+              </div>
+            )}
 
             {/* Pagination Footer */}
             {showPagination && (
