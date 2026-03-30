@@ -22,6 +22,16 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
+      "/get-list-by-lookup-code": {
+        target: "https://sureze.ddns.net:3333",
+        changeOrigin: true,
+        secure: false,
+      },
+      "/get-list-by-lookup-codes": {
+        target: "https://sureze.ddns.net:3333",
+        changeOrigin: true,
+        secure: false,
+      },
     },
   },
 });

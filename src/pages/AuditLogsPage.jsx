@@ -197,7 +197,7 @@ export default function AuditLogsPage() {
     <div className="h-full flex flex-col overflow-hidden animate-in fade-in duration-500">
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-white/10 shadow-xl overflow-hidden flex flex-col flex-1">
         {/* Header Section */}
-        <div className="px-8 py-6 border-b border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-white/2 shrink-0">
+        <div className="px-8 py-6 bg-slate-50/50 dark:bg-white/2 shrink-0">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-4">
               <button

@@ -138,10 +138,10 @@ function CollapsibleRow({ row }) {
               sx={{
                 p: 4,
                 bgcolor: "rgba(248, 250, 252, 0.5)",
-                borderY: "1px solid rgba(226, 232, 240, 1)",
+                border: "none",
                 ".dark &": {
                   bgcolor: "rgba(15, 23, 42, 0.4)",
-                  borderColor: "rgba(255, 255, 255, 0.05)",
+                  borderColor: "transparent",
                 }
               }}
             >
@@ -199,10 +199,10 @@ export default function CollapsibleAuditLogTable({
             <TableRow sx={{ 
               "& th": { 
                 bgcolor: "rgba(248, 250, 252, 0.9)", 
-                borderBottom: "2px solid #e2e8f0",
+                borderBottom: "none !important",
                 ".dark &": {
                   bgcolor: "#0f172a",
-                  borderColor: "rgba(255, 255, 255, 0.05)",
+                  borderColor: "transparent",
                   color: "#94a3b8"
                 }
               } 
@@ -233,7 +233,7 @@ export default function CollapsibleAuditLogTable({
       </TableContainer>
 
       {/* Standard Pagination Footer (Site Style) */}
-      <div className="px-8 py-5 border-t border-slate-100 dark:border-white/5 bg-slate-50/30 dark:bg-slate-900/50 flex items-center justify-between shrink-0">
+      <div className="px-8 py-5 bg-slate-50/30 dark:bg-slate-900/50 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
           <span className="text-[10px] text-slate-400">Rows:</span>
           <select

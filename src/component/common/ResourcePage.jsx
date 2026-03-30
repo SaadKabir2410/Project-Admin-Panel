@@ -32,7 +32,7 @@ export function ActionsMenu({
     <div>
       <button
         onClick={handleClick}
-        className="h-[28px] w-fit px-3 bg-white dark:bg-transparent border border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-500/10 text-blue-500 text-[10px] font-medium rounded-lg transition-all inline-flex items-center justify-center gap-1 shadow-sm"
+        className="h-[26px] w-fit px-3 bg-blue-600 hover:bg-blue-700 text-white text-[9.5px] font-black rounded-lg border-none outline-none transition-all inline-flex items-center justify-center gap-1.5 shadow-md shadow-blue-500/20"
       >
         Actions <ChevronDown size={12} strokeWidth={2.5} />
       </button>
@@ -46,10 +46,8 @@ export function ActionsMenu({
           sx: {
             mt: 1,
             borderRadius: "12px",
-            boxShadow:
-              "0 4px 6px -2px rgba(0, 0, 0, 0.05), 0 10px 15px -3px rgba(0, 0, 0, 0.1)",
-            border: "1px solid",
-            borderColor: "divider",
+            border: "none",
+            boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1)",
             minWidth: 160,
           },
         }}
@@ -658,7 +656,7 @@ export default function ResourcePage({
                     color: isDark ? "rgba(255, 255, 255, 0.85)" : "inherit",
                     "& .MuiDataGrid-columnHeaders": {
                       bgcolor: isDark ? "rgba(30, 41, 59, 0.8)" : "rgba(248, 250, 252, 0.8)",
-                      borderBottom: isDark ? "2px solid rgba(51, 65, 85, 1)" : "2px solid rgba(226, 232, 240, 1)",
+                      borderBottom: "none",
                       minHeight: `${headerHeight}px !important`,
                       maxHeight: `${headerHeight}px !important`,
                       "& .MuiDataGrid-columnHeaderTitle": {
@@ -667,12 +665,16 @@ export default function ResourcePage({
                         color: isDark ? "rgba(148, 163, 184, 1)" : "rgb(71 85 105)",
                         letterSpacing: "0.05em",
                       },
+                      "&:focus, &:focus-within": { outline: "none !important" },
                     },
+                    "& .MuiDataGrid-columnHeader": { borderRight: "none !important" },
                     "& .MuiDataGrid-cell": {
-                      borderColor: isDark ? "rgba(51, 65, 85, 0.5)" : "rgba(241, 245, 249, 1)",
+                      borderBottom: "none",
+                      borderRight: "none !important",
                       display: "flex",
                       alignItems: "center",
                       color: "inherit",
+                      "&:focus, &:focus-within": { outline: "none !important" },
                     },
                     "& .MuiDataGrid-row:hover": {
                       bgcolor: isDark ? "rgba(59, 130, 246, 0.1)" : "rgba(59, 130, 246, 0.04)",
